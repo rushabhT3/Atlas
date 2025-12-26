@@ -358,7 +358,7 @@ function App() {
         zIndex: 1000, 
         boxShadow: '2px 0 5px rgba(0,0,0,0.1)'
       }}>
-        <h2 style={{ color: '#002', marginBottom: '20px' }}>🚛 Spotter ELD Planner</h2>
+        <h2 style={{ color: '#002', marginBottom: '20px' }}>🚛 Atlas: ELD Planner</h2>
         
         <form onSubmit={handleSubmit}>
           <AddressInput label="Current Location" value={formData.current} onChange={v => setFormData({...formData, current: v})} />
