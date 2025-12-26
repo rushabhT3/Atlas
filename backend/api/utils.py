@@ -1,7 +1,8 @@
 import requests
-import time
 
+# ============================================
 # FMCSA REGULATIONS
+# ============================================
 MAX_DRIVE_TIME = 11.0  # 11-hour driving limit
 MAX_DUTY_WINDOW = 14.0  # 14-hour duty window
 BREAK_REQUIRED_AFTER = 8.0  # 30-min break after 8 hours driving
@@ -24,7 +25,6 @@ def get_osrm_route(start_coords, end_coords):
             return None
         route = res["routes"][0]
         return {
-            "duration_hours": route["duration"] / 3600,
             "distance_miles": route["distance"] * 0.000621371,
             "geometry": route["geometry"],
         }
@@ -82,19 +82,14 @@ def interpolate_along_route(geometry_coords, fraction):
     for i, seg_len in enumerate(segment_lengths):
         if current_distance + seg_len >= target_distance:
             # Interpolate within this segment
-            if seg_len > 0:
-                seg_fraction = (target_distance - current_distance) / seg_len
-            else:
-                seg_fraction = 0
-
+            seg_fraction = (
+                (target_distance - current_distance) / seg_len if seg_len > 0 else 0
+            )
             p1 = geometry_coords[i]
             p2 = geometry_coords[i + 1]
-
             lon = p1[0] + (p2[0] - p1[0]) * seg_fraction
             lat = p1[1] + (p2[1] - p1[1]) * seg_fraction
-
             return f"{lon},{lat}"
-
         current_distance += seg_len
 
     # Return last point if we've gone past
@@ -135,14 +130,12 @@ def calculate_schedule(current_loc, pickup_loc, dropoff_loc, cycle_used_input):
     # Initialize trackers
     logs = []
     stops = []
-
     current_time = 6.0  # Start at 6:00 AM
     cycle_used = float(cycle_used_input) if cycle_used_input else 0.0
     drive_clock = 0.0
     window_clock = 0.0
     since_break_clock = 0.0
     miles_since_fuel = 0.0
-    total_miles_driven = 0.0
 
     # --- HELPER FUNCTION ---
     def add_event(status, duration, loc_coords, remark, stop_type=None):
@@ -195,13 +188,16 @@ def calculate_schedule(current_loc, pickup_loc, dropoff_loc, cycle_used_input):
                 since_break_clock = 0
             if duration >= 34.0:
                 cycle_used = 0
-                drive_clock = 0
-                window_clock = 0
-                since_break_clock = 0
+
+    # --- POSITION HELPER ---
+    def get_position(geometry_coords, fraction, fallback_coords):
+        """Get position with proper string fallback"""
+        pos = interpolate_along_route(geometry_coords, fraction)
+        return pos if pos else fallback_coords
 
     # --- DRIVING SIMULATION FUNCTION ---
-    def drive_leg(start_coords, end_coords, total_miles, geometry_coords, leg_name):
-        nonlocal miles_since_fuel, total_miles_driven
+    def drive_leg(start_coords, total_miles, geometry_coords, leg_name):
+        nonlocal miles_since_fuel
 
         remaining = total_miles
         driven_on_leg = 0.0
@@ -210,9 +206,7 @@ def calculate_schedule(current_loc, pickup_loc, dropoff_loc, cycle_used_input):
 
             # Current position on this leg
             fraction = driven_on_leg / total_miles if total_miles > 0 else 0
-            current_pos = (
-                interpolate_along_route(geometry_coords, fraction) or start_coords
-            )
+            current_pos = get_position(geometry_coords, fraction, start_coords)
 
             # Calculate available driving time under each constraint
             time_to_finish = remaining / AVG_SPEED
@@ -275,15 +269,12 @@ def calculate_schedule(current_loc, pickup_loc, dropoff_loc, cycle_used_input):
                 remaining -= miles_driven
 
             driven_on_leg += miles_driven
-            total_miles_driven += miles_driven
             miles_since_fuel += miles_driven
 
             # Now handle the stop if we didn't finish
             if remaining > 0.5:
                 fraction = driven_on_leg / total_miles if total_miles > 0 else 1
-                stop_pos = (
-                    interpolate_along_route(geometry_coords, fraction) or current_pos
-                )
+                stop_pos = get_position(geometry_coords, fraction, current_pos)
 
                 # Check what we need
                 new_time_until_fuel = (FUEL_INTERVAL - miles_since_fuel) / AVG_SPEED
@@ -332,17 +323,13 @@ def calculate_schedule(current_loc, pickup_loc, dropoff_loc, cycle_used_input):
     add_event("ON_DUTY", 0.25, curr_coords, "Pre-trip Inspection", "inspection")
 
     # LEG 1: Current -> Pickup
-    drive_leg(
-        curr_coords, pick_coords, leg1["distance_miles"], leg1_geometry, "to Pickup"
-    )
+    drive_leg(curr_coords, leg1["distance_miles"], leg1_geometry, "to Pickup")
 
     # Pickup (1 hour loading)
     add_event("ON_DUTY", LOAD_UNLOAD_TIME, pick_coords, "Loading at Pickup", "pickup")
 
     # LEG 2: Pickup -> Dropoff
-    drive_leg(
-        pick_coords, drop_coords, leg2["distance_miles"], leg2_geometry, "to Dropoff"
-    )
+    drive_leg(pick_coords, leg2["distance_miles"], leg2_geometry, "to Dropoff")
 
     # Dropoff (1 hour unloading)
     add_event(
@@ -363,16 +350,6 @@ def calculate_schedule(current_loc, pickup_loc, dropoff_loc, cycle_used_input):
     # ========================================
     # BUILD RESPONSE
     # ========================================
-
-    # Combine route geometries
-    combined_geometry = None
-    if leg1_geometry and leg2_geometry:
-        combined_geometry = {
-            "type": "LineString",
-            "coordinates": leg1_geometry + leg2_geometry,
-        }
-    elif leg2_geometry:
-        combined_geometry = {"type": "LineString", "coordinates": leg2_geometry}
 
     # Calculate summary
     total_drive = sum(l["end"] - l["start"] for l in logs if l["status"] == "DRIVING")
