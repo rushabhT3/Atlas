@@ -44,9 +44,9 @@ const SingleDayCanvas = ({ dayIndex, dayLogs, calibration }) => {
             ctx.drawImage(img, 0, 0);
 
             // Day label
-            ctx.font = "bold 16px Arial";
-            ctx.fillStyle = "#333";
-            ctx.fillText(`Day ${dayIndex + 1}`, img.width - 120, 40);
+            ctx.font = "bold 16px Outfit";
+            ctx.fillStyle = "#000";
+            ctx.fillText(`DAY ${dayIndex + 1}`, img.width - 120, 40);
 
             if (!dayLogs || dayLogs.length === 0) return;
 
@@ -108,7 +108,7 @@ const SingleDayCanvas = ({ dayIndex, dayLogs, calibration }) => {
 
             // Draw status line
             ctx.lineWidth = 3;
-            ctx.strokeStyle = '#000080';
+            ctx.strokeStyle = '#000';
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.beginPath();
@@ -153,9 +153,9 @@ const SingleDayCanvas = ({ dayIndex, dayLogs, calibration }) => {
                 
                 // Draw pointer line
                 ctx.save();
-                ctx.strokeStyle = '#888';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([3, 3]);
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 0.5;
+                ctx.setLineDash([2, 4]);
                 ctx.beginPath();
                 ctx.moveTo(x, y + 8);
                 ctx.lineTo(x, remarkY - 10);
@@ -164,9 +164,9 @@ const SingleDayCanvas = ({ dayIndex, dayLogs, calibration }) => {
                 
                 // Draw marker dot
                 ctx.save();
-                ctx.fillStyle = '#000080';
+                ctx.fillStyle = '#000';
                 ctx.beginPath();
-                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
                 
@@ -174,10 +174,11 @@ const SingleDayCanvas = ({ dayIndex, dayLogs, calibration }) => {
                 ctx.save();
                 ctx.translate(x, remarkY);
                 ctx.rotate(-0.4);
-                ctx.font = "10px Arial";
-                ctx.fillStyle = "#444";
+                ctx.font = "bold 9px Outfit";
+                ctx.fillStyle = "#000";
+                ctx.textTransform = "uppercase";
                 
-                let text = seg.remarks;
+                let text = seg.remarks.toUpperCase();
                 if (text.length > 22) text = text.substring(0, 20) + '...';
                 ctx.fillText(text, 2, 0);
                 ctx.restore();
@@ -188,7 +189,7 @@ const SingleDayCanvas = ({ dayIndex, dayLogs, calibration }) => {
     }, [dayLogs, dayIndex, calibration]);
 
     return (
-        <div style={{ marginBottom: '15px', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
+        <div style={{ marginBottom: '30px', border: '1px solid black', borderRadius: '0', overflow: 'hidden' }}>
             <canvas ref={canvasRef} style={{ width: '100%', height: 'auto', display: 'block' }} />
         </div>
     );
@@ -197,23 +198,31 @@ const SingleDayCanvas = ({ dayIndex, dayLogs, calibration }) => {
 const LogCanvas = ({ logs, calibration, onOpenCalibration }) => {
     if (!logs || logs.length === 0) {
         return (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
-                <div style={{ fontSize: '48px', marginBottom: '15px' }}>📋</div>
-                <div>Generate a trip to see daily logs here.</div>
+            <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column',
+                alignItems: 'center', 
+                justifyContent: 'center',
+                padding: '80px 40px', 
+                color: 'var(--text-color)',
+                border: '1px dashed var(--border-color)',
+                textAlign: 'center'
+            }}>
+                <div style={{ fontSize: '10px', fontWeight: '900', letterSpacing: '0.1em', marginBottom: '20px' }}>
+                    DAILY LOGS UNAVAILABLE
+                </div>
+                <div style={{ fontSize: '12px', opacity: 0.6, marginBottom: '30px', maxWidth: '300px' }}>
+                    GENERATE A TRIP TO VIEW AND ANALYZE THE ELECTRONIC LOGGING DATA FOR EACH DAY.
+                </div>
                 {onOpenCalibration && (
                     <button
                         onClick={onOpenCalibration}
                         style={{
-                            marginTop: '20px',
-                            padding: '10px 20px',
-                            background: '#6366f1',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer'
+                            padding: '12px 24px',
+                            fontSize: '10px'
                         }}
                     >
-                        📐 Calibrate Log Sheet
+                        CALIBRATE LOG SHEET
                     </button>
                 )}
             </div>
@@ -229,47 +238,47 @@ const LogCanvas = ({ logs, calibration, onOpenCalibration }) => {
                 display: 'flex', 
                 justifyContent: 'space-between', 
                 alignItems: 'center', 
-                marginBottom: '15px' 
+                marginBottom: '30px',
+                borderBottom: '1px solid black',
+                paddingBottom: '15px'
             }}>
-                <h2 style={{ margin: 0, color: '#333' }}>📋 Daily Logs</h2>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: '900', letterSpacing: '-0.02em' }}>
+                    DAILY LOGS
+                </h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <span style={{ 
-                        background: '#e0e7ff', 
-                        color: '#3730a3', 
-                        padding: '4px 12px', 
-                        borderRadius: '20px',
-                        fontSize: '13px',
-                        fontWeight: '500'
+                        fontSize: '10px',
+                        fontWeight: '900',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
                     }}>
-                        {totalDays} Day{totalDays > 1 ? 's' : ''}
+                        {totalDays} DAY{totalDays > 1 ? 'S' : ''} DETECTED
                     </span>
                     {onOpenCalibration && (
                         <button
                             onClick={onOpenCalibration}
                             style={{
-                                padding: '4px 12px',
-                                background: '#f3f4f6',
-                                color: '#374151',
-                                border: '1px solid #d1d5db',
-                                borderRadius: '20px',
-                                cursor: 'pointer',
-                                fontSize: '12px'
+                                padding: '6px 14px',
+                                fontSize: '9px',
+                                borderRadius: '0'
                             }}
                         >
-                            📐 Calibrate
+                            CALIBRATE
                         </button>
                     )}
                 </div>
             </div>
             
-            {Array.from({ length: totalDays }).map((_, i) => (
-                <SingleDayCanvas 
-                    key={i} 
-                    dayIndex={i} 
-                    dayLogs={logs}
-                    calibration={calibration}
-                />
-            ))}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px' }}>
+                {Array.from({ length: totalDays }).map((_, i) => (
+                    <SingleDayCanvas 
+                        key={i} 
+                        dayIndex={i} 
+                        dayLogs={logs}
+                        calibration={calibration}
+                    />
+                ))}
+            </div>
         </div>
     );
 };

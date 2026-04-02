@@ -155,37 +155,39 @@ const formatTime = (hours) => {
 // ============================================
 const MapLegend = () => (
   <div style={{
-    position: 'absolute', bottom: '20px', left: '10px',
-    background: 'white', padding: '12px 15px', borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.2)', zIndex: 1000, fontSize: '11px', maxWidth: '200px'
+    position: 'absolute', bottom: '20px', left: '20px',
+    background: 'white', padding: '20px', 
+    border: '1px solid black',
+    zIndex: 1000, fontSize: '10px', maxWidth: '180px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em'
   }}>
-    <div style={{ fontWeight: 'bold', marginBottom: '10px', borderBottom: '1px solid #ddd', paddingBottom: '5px' }}>
-      🗺️ Map Legend
+    <div style={{ fontWeight: '900', marginBottom: '15px', borderBottom: '1px solid black', paddingBottom: '8px' }}>
+      Map Legend
     </div>
-    <div style={{ marginBottom: '10px', paddingBottom: '8px', borderBottom: '1px solid #eee' }}>
-      <div style={{ fontWeight: '600', marginBottom: '5px', fontSize: '10px', color: '#666' }}>ROUTES</div>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-        <div style={{ width: '24px', height: '4px', background: ROUTE_COLORS.leg1.main, marginRight: '8px', borderRadius: '2px' }}></div>
+    <div style={{ marginBottom: '12px', paddingBottom: '10px', borderBottom: '1px solid #eee' }}>
+      <div style={{ fontWeight: '900', marginBottom: '8px', opacity: 0.5 }}>ROUTES</div>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '6px' }}>
+        <div style={{ width: '12px', height: '12px', background: ROUTE_COLORS.leg1.main, marginRight: '8px', border: '1px solid black' }}></div>
         <span>Current → Pickup</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <div style={{ width: '24px', height: '4px', background: ROUTE_COLORS.leg2.main, marginRight: '8px', borderRadius: '2px' }}></div>
+        <div style={{ width: '12px', height: '12px', background: ROUTE_COLORS.leg2.main, marginRight: '8px', border: '1px solid black' }}></div>
         <span>Pickup → Dropoff</span>
       </div>
     </div>
-    <div style={{ fontWeight: '600', marginBottom: '5px', fontSize: '10px', color: '#666' }}>STOPS</div>
-    {Object.entries(STOP_STYLES).map(([key, style]) => (
-      <div key={key} style={{ display: 'flex', alignItems: 'center', marginBottom: '3px' }}>
-        <div style={{
-          width: '18px', height: '18px', borderRadius: '50%', background: style.fillColor,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '8px',
-          border: '2px solid white', boxShadow: '0 1px 2px rgba(0,0,0,0.2)'
-        }}>
-          <span style={{ color: 'white', fontSize: '9px', fontWeight: 'bold' }}>{style.letter}</span>
+    <div style={{ fontWeight: '900', marginBottom: '8px', opacity: 0.5 }}>STOPS</div>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '4px' }}>
+      {Object.entries(STOP_STYLES).map(([key, style]) => (
+        <div key={key} style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{
+            width: '10px', height: '10px', background: style.fillColor,
+            marginRight: '8px', border: '1px solid black'
+          }}></div>
+          <span>{style.label}</span>
         </div>
-        <span>{style.icon} {style.label}</span>
-      </div>
-    ))}
+      ))}
+    </div>
   </div>
 );
 
@@ -193,26 +195,25 @@ const TripSummary = ({ summary }) => {
   if (!summary) return null;
   return (
     <div style={{
-      position: 'absolute', top: '10px', right: '10px', background: 'white',
-      padding: '12px 15px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-      zIndex: 1000, fontSize: '12px', minWidth: '180px'
+      position: 'absolute', top: '20px', right: '20px', background: 'white',
+      padding: '20px', border: '1px solid black',
+      zIndex: 1000, fontSize: '11px', minWidth: '200px',
+      textTransform: 'uppercase', letterSpacing: '0.05em'
     }}>
-      <div style={{ fontWeight: 'bold', marginBottom: '10px', borderBottom: '1px solid #eee', paddingBottom: '8px' }}>
-        📊 Trip Summary
+      <div style={{ fontWeight: '900', marginBottom: '15px', borderBottom: '1px solid black', paddingBottom: '8px' }}>
+        Trip Summary
       </div>
-      <div style={{ marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid #f0f0f0' }}>
-        <div style={{ fontWeight: 'bold', fontSize: '18px' }}>{summary.total_miles?.toLocaleString()} mi</div>
-        <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
-          <span style={{ color: ROUTE_COLORS.leg1.main }}>■</span> {summary.leg1_miles?.toLocaleString()} mi
-          <span style={{ margin: '0 5px' }}>|</span>
-          <span style={{ color: ROUTE_COLORS.leg2.main }}>■</span> {summary.leg2_miles?.toLocaleString()} mi
+      <div style={{ marginBottom: '15px' }}>
+        <div style={{ fontWeight: '900', fontSize: '24px', letterSpacing: '-0.05em' }}>{summary.total_miles?.toLocaleString()} <span style={{ fontSize: '12px' }}>MI</span></div>
+        <div style={{ fontSize: '9px', opacity: 0.6, marginTop: '4px' }}>
+          Leg 1: {summary.leg1_miles?.toLocaleString()} mi | Leg 2: {summary.leg2_miles?.toLocaleString()} mi
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-        <div><div style={{ color: '#666', fontSize: '10px' }}>Drive Time</div><div style={{ fontWeight: '600' }}>{summary.total_drive_time} hrs</div></div>
-        <div><div style={{ color: '#666', fontSize: '10px' }}>Rest Time</div><div style={{ fontWeight: '600' }}>{summary.total_rest_time} hrs</div></div>
-        <div><div style={{ color: '#666', fontSize: '10px' }}>Trip Duration</div><div style={{ fontWeight: '600' }}>{summary.total_trip_time} hrs</div></div>
-        <div><div style={{ color: '#666', fontSize: '10px' }}>Days</div><div style={{ fontWeight: '600' }}>{summary.num_days}</div></div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <div><div style={{ opacity: 0.5, fontSize: '9px' }}>Drive Time</div><div style={{ fontWeight: '700' }}>{summary.total_drive_time} H</div></div>
+        <div><div style={{ opacity: 0.5, fontSize: '9px' }}>Rest Time</div><div style={{ fontWeight: '700' }}>{summary.total_rest_time} H</div></div>
+        <div><div style={{ opacity: 0.5, fontSize: '9px' }}>Duration</div><div style={{ fontWeight: '700' }}>{summary.total_trip_time} H</div></div>
+        <div><div style={{ opacity: 0.5, fontSize: '9px' }}>Days</div><div style={{ fontWeight: '700' }}>{summary.num_days}</div></div>
       </div>
     </div>
   );
@@ -352,13 +353,24 @@ function App() {
         width: sidebarWidth, 
         minWidth: sidebarWidth, 
         flexShrink: 0, 
-        padding: '20px', 
-        background: '#f4f4f4', 
+        padding: '30px 40px', 
+        background: 'var(--bg-color)', 
         overflowY: 'auto', 
         zIndex: 1000, 
-        boxShadow: '2px 0 5px rgba(0,0,0,0.1)'
+        borderRight: '1px solid var(--border-color)',
+        display: 'flex',
+        flexDirection: 'column'
       }}>
-        <h2 style={{ color: '#002', marginBottom: '20px' }}>🚛 Atlas: ELD Planner</h2>
+        <h2 style={{ 
+          color: 'var(--text-color)', 
+          fontSize: '1.2rem',
+          marginBottom: '40px',
+          fontWeight: '900',
+          letterSpacing: '-0.03em'
+        }}>
+          🚛 Atlas 
+          <span style={{ fontWeight: '300', marginLeft: '5px', opacity: 0.6 }}>ELD Planner</span>
+        </h2>
         
         <form onSubmit={handleSubmit}>
           <AddressInput label="Current Location" value={formData.current} onChange={v => setFormData({...formData, current: v})} />
@@ -379,13 +391,10 @@ function App() {
 
           <button type="submit" disabled={loading}
             style={{ 
-              width: '100%', padding: '15px', 
-              background: loading ? '#ccc' : '#000080', 
-              color: 'white', border: 'none', 
-              cursor: loading ? 'not-allowed' : 'pointer',
-              borderRadius: '5px', fontWeight: 'bold', fontSize: '14px'
+              width: '100%',
+              marginTop: '10px'
             }}>
-            {loading ? '⏳ GENERATING...' : '🗺️ GENERATE TRIP & LOGS'}
+            {loading ? '⏳ GENERATING...' : 'GENERATE TRIP & LOGS'}
           </button>
         </form>
 
@@ -397,62 +406,88 @@ function App() {
 
         {/* Calibration Status */}
         <div style={{ 
-          marginTop: '20px', 
-          padding: '10px 15px', 
-          background: calibration ? '#d1fae5' : '#fef3c7',
-          borderRadius: '5px',
+          marginTop: '40px', 
+          padding: '20px 0', 
+          borderTop: '1px solid var(--border-color)',
           fontSize: '12px',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          flexDirection: 'column',
+          gap: '12px'
         }}>
-          <span>
-            {calibration ? '✅ Log sheet calibrated' : '⚠️ Log sheet not calibrated'}
+          <span style={{ fontWeight: '700', textTransform: 'uppercase' }}>
+            {calibration ? 'Status: CALIBRATED' : 'Status: UNCALIBRATED'}
           </span>
           <button
             onClick={() => setShowCalibration(true)}
             style={{
-              padding: '5px 10px',
-              background: '#6366f1',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '11px'
+              alignSelf: 'flex-start',
+              padding: '8px 16px',
+              fontSize: '10px'
             }}
           >
-            📐 {calibration ? 'Recalibrate' : 'Calibrate'}
+            {calibration ? 'Recalibrate System' : 'Calibrate System'}
           </button>
         </div>
 
         {/* STOPS LIST */}
         {tripData?.stops && tripData.stops.length > 0 && (
-          <div style={{ marginTop: '20px' }}>
-            <h3 style={{ marginBottom: '10px', color: '#333' }}>📍 Stops ({tripData.stops.length})</h3>
-            <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+          <div style={{ marginTop: '40px' }}>
+            <h3 style={{ 
+              marginBottom: '20px', 
+              fontSize: '10px', 
+              fontWeight: '900', 
+              letterSpacing: '0.1em',
+              borderBottom: '1px solid black',
+              paddingBottom: '10px'
+            }}>
+              PLANNED STOPS ({tripData.stops.length})
+            </h3>
+            <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '10px' }}>
               {tripData.stops.map((stop, idx) => {
                 const style = STOP_STYLES[stop.type] || STOP_STYLES.break;
                 return (
                   <div key={idx} style={{
-                    display: 'flex', alignItems: 'flex-start',
-                    padding: '10px', marginBottom: '8px',
-                    background: 'white', borderRadius: '5px',
-                    borderLeft: `4px solid ${style.color}`,
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                    display: 'flex',
+                    flexDirection: 'column',
+                    padding: '15px 0',
+                    marginBottom: '0',
+                    background: 'transparent',
+                    borderBottom: '1px solid #eee',
+                    position: 'relative'
                   }}>
                     <div style={{
-                      width: '26px', height: '26px', borderRadius: '50%', background: style.fillColor,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      marginRight: '10px', flexShrink: 0
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      marginBottom: '8px'
                     }}>
-                      <span style={{ color: 'white', fontWeight: 'bold', fontSize: '11px' }}>{style.letter}</span>
+                      <div style={{
+                        width: '8px', 
+                        height: '8px', 
+                        background: style.fillColor,
+                        border: '1px solid black',
+                        flexShrink: 0
+                      }}></div>
+                      <div style={{ 
+                        fontWeight: '900', 
+                        fontSize: '11px', 
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.02em'
+                      }}>
+                        {style.label}
+                      </div>
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 'bold', fontSize: '12px' }}>{style.icon} {style.label}</div>
-                      <div style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>{stop.remark}</div>
-                      <div style={{ fontSize: '10px', color: '#999', marginTop: '2px' }}>
+                    <div style={{ paddingLeft: '20px' }}>
+                      <div style={{ fontSize: '11px', color: '#666', lineHeight: '1.4' }}>{stop.remark}</div>
+                      <div style={{ 
+                        fontSize: '9px', 
+                        fontWeight: '700', 
+                        marginTop: '6px',
+                        textTransform: 'uppercase',
+                        opacity: 0.6
+                      }}>
                         {formatTime(stop.time)}
-                        {stop.duration > 0 && ` • ${(stop.duration * 60).toFixed(0)} min`}
+                        {stop.duration > 0 && ` • ${(stop.duration * 60).toFixed(0)} MIN`}
                       </div>
                     </div>
                   </div>
@@ -467,18 +502,21 @@ function App() {
       <div
         onMouseDown={startSidebarResize}
         style={{
-          width: '6px',
+          width: '1px',
           cursor: 'col-resize',
-          background: '#e0e0e0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'background 0.2s',
+          background: 'var(--border-color)',
+          zIndex: 1001,
+          position: 'relative'
         }}
-        onMouseEnter={(e) => e.target.style.background = '#bbb'}
-        onMouseLeave={(e) => e.target.style.background = '#e0e0e0'}
       >
-        <div style={{ width: '2px', height: '40px', background: '#999', borderRadius: '1px' }} />
+        <div style={{ 
+          position: 'absolute', 
+          top: '50%', 
+          left: '-10px', 
+          width: '20px', 
+          height: '40px', 
+          cursor: 'col-resize' 
+        }} />
       </div>
 
       {/* RIGHT PANEL */}
@@ -515,18 +553,21 @@ function App() {
         <div
           onMouseDown={startMapResize}
           style={{
-            height: '6px',
+            height: '1px',
             cursor: 'row-resize',
-            background: '#e0e0e0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'background 0.2s',
+            background: 'var(--border-color)',
+            position: 'relative',
+            zIndex: 1001
           }}
-          onMouseEnter={(e) => e.target.style.background = '#bbb'}
-          onMouseLeave={(e) => e.target.style.background = '#e0e0e0'}
         >
-          <div style={{ width: '40px', height: '2px', background: '#999', borderRadius: '1px' }} />
+          <div style={{ 
+            position: 'absolute', 
+            left: '50%', 
+            top: '-10px', 
+            width: '40px', 
+            height: '20px', 
+            cursor: 'row-resize' 
+          }} />
         </div>
 
         {/* LOGS */}

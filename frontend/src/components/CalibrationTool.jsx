@@ -2,13 +2,13 @@ import React, { useRef, useState, useEffect } from 'react';
 import logBg from '../assets/blank-paper-log.png';
 
 const POINT_LABELS = [
-    { key: 'gridStartX', label: 'Hour 0 (Midnight - Left Edge)', instruction: 'Click the LEFT edge of the time grid (where hour 0/midnight starts)' },
-    { key: 'gridEndX', label: 'Hour 24 (Midnight - Right Edge)', instruction: 'Click the RIGHT edge of the time grid (where hour 24/midnight ends)' },
-    { key: 'offDutyY', label: 'OFF DUTY Row', instruction: 'Click the CENTER of the OFF DUTY row' },
-    { key: 'sleeperY', label: 'SLEEPER BERTH Row', instruction: 'Click the CENTER of the SLEEPER BERTH row' },
-    { key: 'drivingY', label: 'DRIVING Row', instruction: 'Click the CENTER of the DRIVING row' },
-    { key: 'onDutyY', label: 'ON DUTY Row', instruction: 'Click the CENTER of the ON DUTY row' },
-    { key: 'remarksY', label: 'REMARKS Area', instruction: 'Click where REMARKS text should start (below the grid)' },
+    { key: 'gridStartX', label: 'HOUR 0 (MIDNIGHT - LEFT EDGE)', instruction: 'CLICK THE LEFT EDGE OF THE TIME GRID (HOUR 0)' },
+    { key: 'gridEndX', label: 'HOUR 24 (MIDNIGHT - RIGHT EDGE)', instruction: 'CLICK THE RIGHT EDGE OF THE TIME GRID (HOUR 24)' },
+    { key: 'offDutyY', label: 'OFF DUTY ROW', instruction: 'CLICK THE CENTER OF THE OFF DUTY ROW' },
+    { key: 'sleeperY', label: 'SLEEPER BERTH ROW', instruction: 'CLICK THE CENTER OF THE SLEEPER BERTH ROW' },
+    { key: 'drivingY', label: 'DRIVING ROW', instruction: 'CLICK THE CENTER OF THE DRIVING ROW' },
+    { key: 'onDutyY', label: 'ON DUTY ROW', instruction: 'CLICK THE CENTER OF THE ON DUTY ROW' },
+    { key: 'remarksY', label: 'REMARKS AREA', instruction: 'CLICK WHERE REMARKS TEXT SHOULD START' },
 ];
 
 const CalibrationTool = ({ onCalibrationComplete, onClose, initialValues }) => {
@@ -39,35 +39,36 @@ const CalibrationTool = ({ onCalibrationComplete, onClose, initialValues }) => {
                 const x = isXPoint ? cal[key] : 100;
                 const y = isXPoint ? 250 : cal[key];
                 
-                // Draw marker
-                ctx.fillStyle = idx < step ? '#22c55e' : '#3b82f6';
-                ctx.beginPath();
-                ctx.arc(x, y, 8, 0, Math.PI * 2);
-                ctx.fill();
+                // Draw square marker (Gufram style)
+                ctx.fillStyle = idx < step ? '#000' : '#000';
+                ctx.fillRect(x - 6, y - 6, 12, 12);
+                ctx.strokeStyle = idx < step ? '#0f0' : '#f00';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x - 6, y - 6, 12, 12);
                 
                 // Draw label
                 ctx.fillStyle = 'white';
-                ctx.font = 'bold 12px Arial';
+                ctx.font = 'bold 10px Outfit';
                 ctx.textAlign = 'center';
                 ctx.fillText(idx + 1, x, y + 4);
                 
                 // Draw line for X points
                 if (isXPoint) {
-                    ctx.strokeStyle = idx < step ? '#22c55e' : '#3b82f6';
-                    ctx.lineWidth = 2;
-                    ctx.setLineDash([5, 5]);
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([4, 4]);
                     ctx.beginPath();
-                    ctx.moveTo(cal[key], 150);
-                    ctx.lineTo(cal[key], 350);
+                    ctx.moveTo(cal[key], 0);
+                    ctx.lineTo(cal[key], ctx.canvas.height);
                     ctx.stroke();
                     ctx.setLineDash([]);
                 }
                 
                 // Draw line for Y points
                 if (!isXPoint && cal.gridStartX && cal.gridEndX) {
-                    ctx.strokeStyle = idx < step ? '#22c55e' : '#3b82f6';
-                    ctx.lineWidth = 2;
-                    ctx.setLineDash([5, 5]);
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([4, 4]);
                     ctx.beginPath();
                     ctx.moveTo(cal.gridStartX, cal[key]);
                     ctx.lineTo(cal.gridEndX, cal[key]);
@@ -163,7 +164,6 @@ const CalibrationTool = ({ onCalibrationComplete, onClose, initialValues }) => {
             IMAGE_SIZE: imageSize
         };
         
-        // Save to localStorage
         localStorage.setItem('eldCalibration', JSON.stringify(config));
         
         if (onCalibrationComplete) {
@@ -172,7 +172,7 @@ const CalibrationTool = ({ onCalibrationComplete, onClose, initialValues }) => {
     };
 
     const isComplete = currentStep >= POINT_LABELS.length;
-    const currentInstruction = POINT_LABELS[currentStep] || { instruction: 'Calibration Complete!' };
+    const currentInstruction = POINT_LABELS[currentStep] || { instruction: 'CALIBRATION COMPLETE!' };
 
     return (
         <div style={{
@@ -181,94 +181,70 @@ const CalibrationTool = ({ onCalibrationComplete, onClose, initialValues }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0,0,0,0.9)',
+            background: 'var(--bg-color)',
             zIndex: 9999,
             display: 'flex',
             flexDirection: 'column',
             overflow: 'auto',
-            padding: '20px'
+            padding: '40px',
+            fontFamily: 'var(--font-family)'
         }}>
             {/* Header */}
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '15px'
+                marginBottom: '40px',
+                borderBottom: '1px solid black',
+                paddingBottom: '20px'
             }}>
-                <h2 style={{ color: 'white', margin: 0 }}>📐 Log Sheet Calibration Tool</h2>
+                <h2 style={{ color: 'black', margin: 0, fontSize: '1.5rem', fontWeight: '900' }}>📐 SYSTEM CALIBRATION</h2>
                 <button 
                     onClick={onClose}
                     style={{
-                        background: '#ef4444',
-                        color: 'white',
-                        border: 'none',
-                        padding: '8px 16px',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        fontWeight: 'bold'
+                        padding: '10px 20px',
+                        fontSize: '10px',
+                        borderRadius: '0'
                     }}
                 >
-                    ✕ Close
+                    CLOSE [X]
                 </button>
             </div>
 
-            {/* Progress */}
-            <div style={{
-                display: 'flex',
-                gap: '5px',
-                marginBottom: '15px'
-            }}>
-                {POINT_LABELS.map((point, idx) => (
-                    <div 
-                        key={idx}
-                        style={{
-                            flex: 1,
-                            height: '8px',
-                            borderRadius: '4px',
-                            background: idx < currentStep ? '#22c55e' : idx === currentStep ? '#3b82f6' : '#374151'
-                        }}
-                    />
-                ))}
-            </div>
-
-            {/* Instruction */}
-            <div style={{
-                background: isComplete ? '#22c55e' : '#3b82f6',
-                color: 'white',
-                padding: '15px 20px',
-                borderRadius: '8px',
-                marginBottom: '15px',
-                textAlign: 'center'
-            }}>
-                <div style={{ fontSize: '14px', opacity: 0.9, marginBottom: '5px' }}>
-                    Step {Math.min(currentStep + 1, POINT_LABELS.length)} of {POINT_LABELS.length}
-                </div>
-                <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
-                    {currentInstruction.instruction}
-                </div>
-            </div>
-
             {/* Main Content */}
-            <div style={{ display: 'flex', gap: '20px', flex: 1 }}>
-                {/* Canvas */}
-                <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', gap: '40px', flex: 1 }}>
+                {/* Canvas Area */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    {/* Instruction */}
                     <div style={{
-                        background: '#1f2937',
-                        padding: '10px',
-                        borderRadius: '8px',
-                        marginBottom: '10px',
-                        fontFamily: 'monospace',
-                        color: '#22c55e',
-                        fontSize: '14px'
+                        background: 'black',
+                        color: 'white',
+                        padding: '25px',
+                        marginBottom: '20px',
+                        textAlign: 'left',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
                     }}>
-                        Cursor: X = {mousePos.x}, Y = {mousePos.y}
+                        <div>
+                            <div style={{ fontSize: '10px', opacity: 0.6, marginBottom: '5px', fontWeight: '900' }}>
+                                STEP {Math.min(currentStep + 1, POINT_LABELS.length)} OF {POINT_LABELS.length}
+                            </div>
+                            <div style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '-0.02em' }}>
+                                {currentInstruction.instruction.toUpperCase()}
+                            </div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '10px', opacity: 0.6, fontWeight: '900' }}>COORDS</div>
+                            <div style={{ fontSize: '14px', fontWeight: '900' }}>X:{mousePos.x} Y:{mousePos.y}</div>
+                        </div>
                     </div>
-                    
+
                     <div style={{ 
-                        border: '3px solid #3b82f6', 
-                        borderRadius: '8px', 
-                        overflow: 'hidden',
-                        display: 'inline-block'
+                        border: '1px solid black', 
+                        background: 'white',
+                        display: 'inline-block',
+                        position: 'relative'
                     }}>
                         <canvas 
                             ref={canvasRef} 
@@ -285,16 +261,14 @@ const CalibrationTool = ({ onCalibrationComplete, onClose, initialValues }) => {
                 </div>
 
                 {/* Sidebar */}
-                <div style={{ width: '320px', flexShrink: 0 }}>
+                <div style={{ width: '380px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     {/* Points List */}
                     <div style={{
-                        background: '#1f2937',
-                        borderRadius: '8px',
-                        padding: '15px',
-                        marginBottom: '15px'
+                        border: '1px solid black',
+                        padding: '25px'
                     }}>
-                        <h3 style={{ color: 'white', margin: '0 0 15px 0', fontSize: '14px' }}>
-                            📍 Calibration Points
+                        <h3 style={{ margin: '0 0 20px 0', fontSize: '10px', fontWeight: '900', letterSpacing: '0.1em' }}>
+                            CALIBRATION STATUS
                         </h3>
                         
                         {POINT_LABELS.map((point, idx) => {
@@ -308,43 +282,32 @@ const CalibrationTool = ({ onCalibrationComplete, onClose, initialValues }) => {
                                     style={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        padding: '10px',
-                                        marginBottom: '8px',
-                                        background: isActive ? '#3b82f6' : isDone ? '#065f46' : '#374151',
-                                        borderRadius: '6px',
-                                        opacity: idx > currentStep ? 0.5 : 1
+                                        padding: '12px 0',
+                                        borderBottom: '1px solid #eee',
+                                        opacity: idx > currentStep ? 0.3 : 1
                                     }}
                                 >
                                     <div style={{
-                                        width: '24px',
-                                        height: '24px',
-                                        borderRadius: '50%',
-                                        background: isDone ? '#22c55e' : isActive ? 'white' : '#6b7280',
+                                        width: '20px',
+                                        height: '20px',
+                                        border: '1px solid black',
+                                        background: isDone ? 'black' : isActive ? 'transparent' : 'transparent',
+                                        marginRight: '15px',
+                                        flexShrink: 0,
                                         display: 'flex',
                                         alignItems: 'center',
-                                        justifyContent: 'center',
-                                        marginRight: '10px',
-                                        flexShrink: 0
+                                        justifyContent: 'center'
                                     }}>
-                                        {isDone ? (
-                                            <span style={{ color: 'white', fontWeight: 'bold' }}>✓</span>
-                                        ) : (
-                                            <span style={{ 
-                                                color: isActive ? '#3b82f6' : 'white', 
-                                                fontWeight: 'bold',
-                                                fontSize: '12px'
-                                            }}>
-                                                {idx + 1}
-                                            </span>
-                                        )}
+                                        {isDone && <span style={{ color: 'white', fontSize: '10px' }}>✓</span>}
+                                        {isActive && <div style={{ width: '8px', height: '8px', background: 'black' }} />}
                                     </div>
                                     <div style={{ flex: 1 }}>
-                                        <div style={{ color: 'white', fontSize: '12px', fontWeight: '500' }}>
+                                        <div style={{ fontSize: '10px', fontWeight: '900' }}>
                                             {point.label}
                                         </div>
                                         {value !== null && (
-                                            <div style={{ color: '#9ca3af', fontSize: '11px', marginTop: '2px' }}>
-                                                {point.key.includes('X') ? `X = ${value}` : `Y = ${value}`}
+                                            <div style={{ fontSize: '10px', opacity: 0.6, marginTop: '2px' }}>
+                                                {point.key.includes('X') ? `X: ${value}` : `Y: ${value}`}
                                             </div>
                                         )}
                                     </div>
@@ -354,21 +317,17 @@ const CalibrationTool = ({ onCalibrationComplete, onClose, initialValues }) => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                    <div style={{ display: 'flex', gap: '15px' }}>
                         <button
                             onClick={handleReset}
                             style={{
                                 flex: 1,
-                                padding: '12px',
-                                background: '#6b7280',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontWeight: 'bold'
+                                borderRadius: '0',
+                                background: 'transparent',
+                                color: 'black'
                             }}
                         >
-                            🔄 Reset
+                            RESET
                         </button>
                         
                         <button
@@ -376,52 +335,32 @@ const CalibrationTool = ({ onCalibrationComplete, onClose, initialValues }) => {
                             disabled={!isComplete}
                             style={{
                                 flex: 2,
-                                padding: '12px',
-                                background: isComplete ? '#22c55e' : '#374151',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                cursor: isComplete ? 'pointer' : 'not-allowed',
-                                fontWeight: 'bold'
+                                borderRadius: '0',
+                                background: isComplete ? 'black' : 'transparent',
+                                color: isComplete ? 'white' : 'black',
+                                opacity: isComplete ? 1 : 0.3
                             }}
                         >
-                            {isComplete ? '✓ Save & Apply' : 'Complete all steps...'}
+                            {isComplete ? 'SAVE CONFIGURATION' : 'COMPLETE STEPS'}
                         </button>
                     </div>
 
-                    {/* Generated Values Preview */}
+                    {/* Preview (Minimalist) */}
                     {isComplete && (
                         <div style={{
-                            background: '#1f2937',
-                            borderRadius: '8px',
-                            padding: '15px'
+                            border: '1px solid black',
+                            padding: '20px',
+                            background: '#000',
+                            color: '#fff'
                         }}>
-                            <h3 style={{ color: 'white', margin: '0 0 10px 0', fontSize: '14px' }}>
-                                💾 Generated Configuration
+                             <h3 style={{ margin: '0 0 10px 0', fontSize: '9px', fontWeight: '900', color: '#666' }}>
+                                JSON PREVIEW
                             </h3>
-                            <pre style={{
-                                background: '#111827',
-                                color: '#9cdcfe',
-                                padding: '12px',
-                                borderRadius: '6px',
-                                fontSize: '11px',
-                                overflow: 'auto',
-                                margin: 0
-                            }}>
-{`GRID_START_X: ${calibration.gridStartX}
-GRID_END_X: ${calibration.gridEndX}
-TOTAL_WIDTH: ${calibration.gridEndX - calibration.gridStartX}
-
-ROW_Y:
-  OFF_DUTY: ${calibration.offDutyY}
-  SLEEPER: ${calibration.sleeperY}
-  DRIVING: ${calibration.drivingY}
-  ON_DUTY: ${calibration.onDutyY}
-
-REMARKS_Y: ${calibration.remarksY}
-
-Image: ${imageSize.width} x ${imageSize.height}`}
-                            </pre>
+                            <div style={{ fontSize: '10px', fontFamily: 'monospace', opacity: 0.8, lineHeight: '1.4' }}>
+                                GRID: {calibration.gridStartX} → {calibration.gridEndX}<br/>
+                                ROWS: {calibration.offDutyY}, {calibration.sleeperY}, {calibration.drivingY}, {calibration.onDutyY}<br/>
+                                REMARK: {calibration.remarksY}
+                            </div>
                         </div>
                     )}
                 </div>
