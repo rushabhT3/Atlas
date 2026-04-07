@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;700;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;700;900&display=swap");
 
 :root {
-  --bg-color: #F2F6F7;
+  --bg-color: #f2f6f7;
   --text-color: #000000;
   --accent-color: #000000;
   --border-color: #000000;
-  --font-family: 'Outfit', sans-serif;
-  
+  --font-family: "Outfit", sans-serif;
+
   font-family: var(--font-family);
   line-height: 1.4;
   font-weight: 400;
@@ -30,7 +30,12 @@ body {
   overflow: hidden;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   text-transform: uppercase;
   font-weight: 900;
   letter-spacing: -0.02em;
@@ -69,7 +74,9 @@ button:disabled {
   cursor: not-allowed;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   font-family: var(--font-family);
   background: white;
   border: 1px solid var(--border-color);

@@ -8,11 +8,13 @@ from apps.compliance import DrivingSimulator
 
 class TripPlanner:
     """Main orchestrator class for trip planning and compliance calculation"""
-    
-    def __init__(self, 
-                 regulations: FMCSARegulations = None,
-                 geocoding_service: GeocodingService = None,
-                 routing_service: RoutingService = None):
+
+    def __init__(
+        self,
+        regulations: FMCSARegulations = None,
+        geocoding_service: GeocodingService = None,
+        routing_service: RoutingService = None,
+    ):
         """Initialize trip planner with dependency injection"""
         self.regulations = regulations or FMCSARegulations()
         self.geocoding_service = geocoding_service or NominatimGeocodingService()
@@ -41,20 +43,20 @@ class TripPlanner:
         coordinates = self._geocode_locations(current_loc, pickup_loc, dropoff_loc)
         if "error" in coordinates:
             return coordinates
-        
+
         curr_coords, pick_coords, drop_coords = coordinates
-        
+
         # Step 2: Get routes
         routes = self._get_routes(curr_coords, pick_coords, drop_coords)
         if "error" in routes:
             return routes
-        
+
         leg1, leg2 = routes
-        
+
         # Step 3: Initialize driver state and simulator
         driver_state = DriverState(self.regulations, cycle_used_input)
         simulator = DrivingSimulator(self.regulations, driver_state)
-        
+
         # Step 4: Execute trip simulation
         self._execute_trip_simulation(
             driver_state, simulator, curr_coords, pick_coords, drop_coords, leg1, leg2
@@ -93,63 +95,78 @@ class TripPlanner:
         leg2 = self.routing_service.get_route(pick_coords, drop_coords)
         if not leg2:
             return {"error": "Could not calculate route from Pickup to Dropoff."}
-        
+
         return leg1, leg2
 
-    def _execute_trip_simulation(self, driver_state: DriverState, simulator: DrivingSimulator,
-                                curr_coords: str, pick_coords: str, drop_coords: str,
-                                leg1: RouteInfo, leg2: RouteInfo):
+    def _execute_trip_simulation(
+        self,
+        driver_state: DriverState,
+        simulator: DrivingSimulator,
+        curr_coords: str,
+        pick_coords: str,
+        drop_coords: str,
+        leg1: RouteInfo,
+        leg2: RouteInfo,
+    ):
         """Execute the complete trip simulation"""
         # Add starting point
-        driver_state.stops.append(StopInfo(
-            coords=curr_coords,
-            type="start",
-            remark="Trip Start",
-            time=driver_state.current_time,
-            duration=0
-        ))
+        driver_state.stops.append(
+            StopInfo(
+                coords=curr_coords,
+                type="start",
+                remark="Trip Start",
+                time=driver_state.current_time,
+                duration=0,
+            )
+        )
 
         # Pre-trip inspection
         driver_state.add_event(
-            self.regulations.ON_DUTY_STATUS, 
-            0.25, 
-            curr_coords, 
-            "Pre-trip Inspection", 
-            "inspection"
+            self.regulations.ON_DUTY_STATUS,
+            0.25,
+            curr_coords,
+            "Pre-trip Inspection",
+            "inspection",
         )
 
         # LEG 1: Current -> Pickup
-        simulator.drive_leg(curr_coords, leg1.distance_miles, leg1.coordinates, "to Pickup")
+        simulator.drive_leg(
+            curr_coords, leg1.distance_miles, leg1.coordinates, "to Pickup"
+        )
 
         # Pickup (1 hour loading)
         driver_state.add_event(
-            self.regulations.ON_DUTY_STATUS, 
-            self.regulations.LOAD_UNLOAD_TIME, 
-            pick_coords, 
-            "Loading at Pickup", 
-            "pickup"
+            self.regulations.ON_DUTY_STATUS,
+            self.regulations.LOAD_UNLOAD_TIME,
+            pick_coords,
+            "Loading at Pickup",
+            "pickup",
         )
 
         # LEG 2: Pickup -> Dropoff
-        simulator.drive_leg(pick_coords, leg2.distance_miles, leg2.coordinates, "to Dropoff")
+        simulator.drive_leg(
+            pick_coords, leg2.distance_miles, leg2.coordinates, "to Dropoff"
+        )
 
         # Dropoff (1 hour unloading)
         driver_state.add_event(
-            self.regulations.ON_DUTY_STATUS, 
-            self.regulations.LOAD_UNLOAD_TIME, 
-            drop_coords, 
-            "Unloading at Dropoff", 
-            "dropoff"
+            self.regulations.ON_DUTY_STATUS,
+            self.regulations.LOAD_UNLOAD_TIME,
+            drop_coords,
+            "Unloading at Dropoff",
+            "dropoff",
         )
 
         # End point
-        driver_state.stops.append(StopInfo(
-            coords=drop_coords,
-            type="end",
-            remark="Trip Complete",
-            time=driver_state.current_time,
-            duration=0
-        ))
+        driver_state.stops.append(
+            StopInfo(
+                coords=drop_coords,
+                type="end",
+                remark="Trip Complete",
+                time=driver_state.current_time,
+                duration=0,
+            )
+        )
 
     def _build_response(
         self, driver_state: DriverState, leg1: RouteInfo, leg2: RouteInfo
@@ -166,7 +183,7 @@ class TripPlanner:
             }
             for log in driver_state.logs
         ]
-        
+
         # Convert stops to dictionary format
         stops = [
             {
@@ -178,17 +195,19 @@ class TripPlanner:
             }
             for stop in driver_state.stops
         ]
-        
+
         # Get summary statistics
         summary = driver_state.get_summary_stats()
-        
+
         # Add route-specific summary
-        summary.update({
-            "total_miles": round(leg1.distance_miles + leg2.distance_miles, 1),
-            "leg1_miles": round(leg1.distance_miles, 1),
-            "leg2_miles": round(leg2.distance_miles, 1),
-        })
-        
+        summary.update(
+            {
+                "total_miles": round(leg1.distance_miles + leg2.distance_miles, 1),
+                "leg1_miles": round(leg1.distance_miles, 1),
+                "leg2_miles": round(leg2.distance_miles, 1),
+            }
+        )
+
         return {
             "logs": logs,
             "stops": stops,

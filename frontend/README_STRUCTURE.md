@@ -57,21 +57,25 @@ frontend/src/
 ## **Design Principles**
 
 ### **1. Feature-Based Architecture**
+
 - Each feature is self-contained
 - Co-located components, hooks, and types
 - Clear feature boundaries
 
 ### **2. Modern React Patterns**
+
 - Functional components with hooks
 - Custom hooks for business logic
 - No class components (unless absolutely necessary)
 
 ### **3. TypeScript Support**
+
 - Full type safety
 - Interface definitions for all data structures
 - Type-safe API responses
 
 ### **4. Separation of Concerns**
+
 - **Components**: UI only
 - **Hooks**: Business logic and state management
 - **Services**: API communication
@@ -81,6 +85,7 @@ frontend/src/
 ## **Key Features**
 
 ### **Trip Planning Feature**
+
 ```typescript
 // Usage
 import { TripPlanningFeature } from '@/features/trip-planning';
@@ -92,19 +97,21 @@ import { TripPlanningFeature } from '@/features/trip-planning';
 ```
 
 ### **Custom Hooks**
+
 ```typescript
 // Resizable panels
 const [width, startResize] = useHorizontalResize(350, 280, 500);
 const [height, startMapResize] = useVerticalResize(ref, 450, 200, 700);
 
 // Local storage
-const [calibration, setCalibration] = useLocalStorage('eldCalibration', null);
+const [calibration, setCalibration] = useLocalStorage("eldCalibration", null);
 
 // Debounced values
 const debouncedSearch = useDebounce(searchTerm, 300);
 ```
 
 ### **Type Safety**
+
 ```typescript
 // All data structures are typed
 interface TripData {
@@ -118,29 +125,34 @@ interface TripData {
 ## **React Best Practices Followed**
 
 ### **1. Component Patterns**
+
 - **Functional Components**: Preferred over class components
 - **Props Destructuring**: Clear prop interfaces
 - **Default Props**: Using TypeScript defaults
 - **Children Prop**: Proper composition patterns
 
 ### **2. State Management**
+
 - **useState**: Local component state
 - **useReducer**: Complex state logic
 - **useContext**: Global state when needed
 - **Custom Hooks**: Reusable state logic
 
 ### **3. Performance Optimization**
+
 - **useCallback**: Memoized functions
 - **useMemo**: Memoized values
 - **React.memo**: Component memoization
 - **Debouncing**: Input optimization
 
 ### **4. Error Handling**
+
 - **Error Boundaries**: Catch component errors
 - **Try-Catch**: API error handling
 - **Fallback UI**: Graceful degradation
 
 ### **5. Code Organization**
+
 - **Barrel Exports**: Clean imports
 - **Index Files**: Feature organization
 - **Absolute Imports**: Consistent paths
@@ -149,6 +161,7 @@ interface TripData {
 ## **Modern JavaScript/TypeScript**
 
 ### **ES6+ Features**
+
 - Destructuring assignment
 - Arrow functions
 - Template literals
@@ -156,6 +169,7 @@ interface TripData {
 - Optional chaining
 
 ### **TypeScript Features**
+
 - Interface definitions
 - Generic types
 - Union types
@@ -165,6 +179,7 @@ interface TripData {
 ## **Development Workflow**
 
 ### **Adding New Features**
+
 1. Create feature directory: `src/features/feature-name/`
 2. Add components: `components/ComponentName.tsx`
 3. Add hooks: `hooks/useFeatureName.ts`
@@ -173,6 +188,7 @@ interface TripData {
 6. Update barrel: `features/index.ts`
 
 ### **Component Guidelines**
+
 1. Single responsibility principle
 2. Props interface required
 3. Default exports preferred
@@ -180,6 +196,7 @@ interface TripData {
 5. Unit tests (if applicable)
 
 ### **Hook Guidelines**
+
 1. Prefix with `use`
 2. Return array or object
 3. TypeScript interfaces
@@ -189,18 +206,21 @@ interface TripData {
 ## **Tooling & Configuration**
 
 ### **Vite Configuration**
+
 - Fast HMR (Hot Module Replacement)
 - TypeScript support
 - Path aliases configured
 - Environment variables
 
 ### **Linting & Formatting**
+
 - ESLint configured
 - Prettier integrated
 - Pre-commit hooks
 - CI/CD integration
 
 ### **Build Optimization**
+
 - Code splitting
 - Tree shaking
 - Asset optimization
@@ -209,24 +229,28 @@ interface TripData {
 ## **Benefits of This Structure**
 
 ### **Maintainability**
+
 - Clear feature boundaries
 - Easy to locate code
 - Consistent patterns
 - Type safety
 
 ### **Scalability**
+
 - Feature-based scaling
 - Reusable components
 - Shared utilities
 - Modular architecture
 
 ### **Developer Experience**
+
 - Fast development with Vite
 - IntelliSense with TypeScript
 - Clear file organization
 - Consistent patterns
 
 ### **Team Collaboration**
+
 - Feature ownership
 - Clear interfaces
 - Reduced conflicts
@@ -235,6 +259,7 @@ interface TripData {
 ## **Migration Path**
 
 ### **From Legacy Structure**
+
 1. Identify features in `App.jsx`
 2. Extract to feature modules
 3. Create shared components
@@ -243,6 +268,7 @@ interface TripData {
 6. Remove legacy code
 
 ### **Gradual Migration**
+
 - Features can be migrated independently
 - Legacy code remains functional
 - A/B testing possible

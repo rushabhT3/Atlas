@@ -4,7 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class FMCSARegulations:
     """Configuration class containing all FMCSA regulatory constants"""
-    
+
     # Time limits (in hours)
     MAX_DRIVE_TIME: float = 11.0
     MAX_DUTY_WINDOW: float = 14.0
@@ -13,12 +13,12 @@ class FMCSARegulations:
     SLEEPER_REST: float = 10.0
     RESTART_34: float = 34.0
     MAX_CYCLE_LIMIT: float = 70.0
-    
+
     # Distance and timing constants
     FUEL_INTERVAL: float = 1000.0
     LOAD_UNLOAD_TIME: float = 1.0
     AVG_SPEED: float = 55.0
-    
+
     # Event types
     DRIVING_STATUS = "DRIVING"
     ON_DUTY_STATUS = "ON_DUTY"

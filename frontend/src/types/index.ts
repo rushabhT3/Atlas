@@ -1,22 +1,22 @@
 // Type definitions for the Atlas ELD Planner
 
 export const LOG_STATUS = {
-  DRIVING: 'DRIVING',
-  ON_DUTY: 'ON_DUTY',
-  OFF_DUTY: 'OFF_DUTY',
-  SLEEPER: 'SLEEPER'
+  DRIVING: "DRIVING",
+  ON_DUTY: "ON_DUTY",
+  OFF_DUTY: "OFF_DUTY",
+  SLEEPER: "SLEEPER",
 } as const;
 
 export const STOP_TYPES = {
-  START: 'start',
-  END: 'end',
-  PICKUP: 'pickup',
-  DROPOFF: 'dropoff',
-  FUEL: 'fuel',
-  SLEEP: 'sleep',
-  BREAK: 'break',
-  RESTART: 'restart',
-  INSPECTION: 'inspection'
+  START: "start",
+  END: "end",
+  PICKUP: "pickup",
+  DROPOFF: "dropoff",
+  FUEL: "fuel",
+  SLEEP: "sleep",
+  BREAK: "break",
+  RESTART: "restart",
+  INSPECTION: "inspection",
 } as const;
 
 export interface LogEntry {

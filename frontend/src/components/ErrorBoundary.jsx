@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -17,12 +17,29 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '20px', border: '2px solid red', borderRadius: '8px', margin: '20px', backgroundColor: '#fff5f5' }}>
-          <h2 style={{ color: '#c53030' }}>Something went wrong.</h2>
-          <p style={{ color: '#742a2a' }}>{this.state.error && this.state.error.toString()}</p>
-          <button 
+        <div
+          style={{
+            padding: "20px",
+            border: "2px solid red",
+            borderRadius: "8px",
+            margin: "20px",
+            backgroundColor: "#fff5f5",
+          }}
+        >
+          <h2 style={{ color: "#c53030" }}>Something went wrong.</h2>
+          <p style={{ color: "#742a2a" }}>
+            {this.state.error && this.state.error.toString()}
+          </p>
+          <button
             onClick={() => window.location.reload()}
-            style={{ padding: '10px 20px', backgroundColor: '#c53030', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#c53030",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
           >
             Reload Page
           </button>

@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { API_ENDPOINTS } from '../constants';
-import { TripFormData, TripData, ApiResponse } from '../types';
+import axios from "axios";
+import { API_ENDPOINTS } from "../constants";
+import { TripFormData, TripData, ApiResponse } from "../types";
 
 /**
  * API service for trip planning
@@ -8,7 +8,10 @@ import { TripFormData, TripData, ApiResponse } from '../types';
 class TripApiService {
   private baseUrl: string;
 
-  constructor(baseUrl: string = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000') {
+  constructor(
+    baseUrl: string = import.meta.env.VITE_BACKEND_URL ||
+      "http://localhost:8000",
+  ) {
     this.baseUrl = baseUrl;
   }
 
@@ -17,22 +20,31 @@ class TripApiService {
    */
   async generateTrip(formData: TripFormData): Promise<ApiResponse<TripData>> {
     try {
-      const response = await axios.post(`${this.baseUrl}${API_ENDPOINTS.GENERATE_TRIP}`, formData);
-      
+      const response = await axios.post(
+        `${this.baseUrl}${API_ENDPOINTS.GENERATE_TRIP}`,
+        formData,
+      );
+
       if (response.data.error) {
         return { error: response.data.error };
       }
-      
+
       return { data: response.data };
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.error || error.message || 'Failed to generate trip';
-        console.error('Trip generation error:', error.response?.data || error.message);
+        const message =
+          error.response?.data?.error ||
+          error.message ||
+          "Failed to generate trip";
+        console.error(
+          "Trip generation error:",
+          error.response?.data || error.message,
+        );
         return { error: message };
       }
-      
-      console.error('Unexpected error:', error);
-      return { error: 'An unexpected error occurred' };
+
+      console.error("Unexpected error:", error);
+      return { error: "An unexpected error occurred" };
     }
   }
 
