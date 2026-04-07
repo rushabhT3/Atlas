@@ -23,7 +23,7 @@ export const STOP_STYLES = {
 };
 
 export const API_ENDPOINTS = {
-  GENERATE_TRIP: '/api/generate-trip/'
+  GENERATE_TRIP: '/trips/generate/'
 };
 
 export const DEFAULT_COORDINATES = {
