@@ -41,7 +41,7 @@ class TripApiService {
    */
   async healthCheck(): Promise<boolean> {
     try {
-      await axios.get(`${this.baseUrl}/api/health/`);
+      await axios.get(`${this.baseUrl}/trips/health/`);
       return true;
     } catch {
       return false;

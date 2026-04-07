@@ -313,7 +313,7 @@ function App() {
     
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
-      const res = await axios.post(`${backendUrl}/api/generate-trip/`, formData);
+      const res = await axios.post(`${backendUrl}/trips/generate/`, formData);
       
       if (res.data.error) {
         setError(res.data.error);

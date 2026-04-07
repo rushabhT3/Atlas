@@ -40,11 +40,8 @@ backend/
 |   |   |-- urls.py                # App URL configuration
 |   |   |-- __init__.py
 |
-|-- services/                      # Shared services (if needed)
-|-- api/                           # Legacy API app (backward compatibility)
-|   |-- utils.py                   # Legacy function wrapper
-|   |-- views.py                   # Legacy API views
-|   |-- urls.py                    # Legacy API URLs
+|-- services/                      # Main service layer
+|   |-- trip_service.py            # Trip planning orchestrator
 |
 |-- manage.py                      # Django management script
 ```
@@ -102,16 +99,10 @@ backend/
 - **Dependency Injection**: Services injected into TripPlanner
 - **Configuration Management**: Centralized in core
 - **Testing Support**: Mock services for all external dependencies
-- **Backward Compatibility**: Legacy API still functional
 
 ## **API Endpoints**
 
-### **Legacy API** (Backward Compatible)
-```
-POST /api/generate/
-```
-
-### **New Modular API**
+### **Main API**
 ```
 POST /trips/generate/
 ```
@@ -168,14 +159,5 @@ Both endpoints accept the same payload:
 - Follows Django and Python best practices
 - Industry-standard project structure
 - Clear documentation and naming conventions
-
-## **Migration from Legacy**
-
-The legacy `api` app is maintained for backward compatibility. To migrate:
-
-1. **Update Imports**: Change from `api.utils` to `apps.trips`
-2. **Use New Services**: Directly use service classes instead of utils
-3. **Update Tests**: Use new mock services
-4. **Update URLs**: Use new app URLs when ready
 
 This structure provides a solid foundation for a professional, maintainable Django application that can grow with the business needs.

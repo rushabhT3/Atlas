@@ -11,19 +11,22 @@ Atlas is a full-stack route planning and compliance application designed for tra
 ### Folder Structure & Main Components
 ```
 Atlas/
-├── backend/                  # Django REST Framework backend
-│   ├── api/                  # Main business logic
-│   │   ├── utils.py          # Trip and log calculation algorithms (FMCSA simulation)
-│   │   └── views.py          # API endpoints for trip generation
-│   └── core/                 # Django settings and configuration
-└── frontend/                 # Vite + React frontend
-    ├── src/
-    │   ├── App.jsx           # Main application shell and map integration
-    │   ├── components/       # Modular UI components
-    │   │   ├── CalibrationTool  # System parameter adjustment
-    │   │   ├── LogCanvas        # Interactive ELD log visualizer
-    │   │   └── AddressInput     # Location entry and validation
-    └── index.html            # Main entry point with Atlas branding
+|-- backend/                     # Django REST Framework backend
+|   |-- apps/                    # Modular application structure
+|   |   |-- geocoding/           # Location to coordinates conversion
+|   |   |-- routing/             # Route calculation and geometry
+|   |   |-- compliance/          # FMCSA simulation and driving logic
+|   |   |-- trips/               # Trip planning orchestration
+|   |-- core/                    # Django settings and configuration
+|   |-- services/                # Main service layer that orchestrates all apps
+|-- frontend/                    # Vite + React frontend
+    |-- src/
+    |   |-- App.jsx              # Main application shell and map integration
+    |   |-- components/          # Modular UI components
+    |   |   |-- CalibrationTool   # System parameter adjustment
+    |   |   |-- LogCanvas        # Interactive ELD log visualizer
+    |   |   |-- AddressInput     # Location entry and validation
+    |-- index.html               # Main entry point with Atlas branding
 ```
 
 ### Technical Deep Dive: Backend Architecture
@@ -34,12 +37,17 @@ The backend is built as a specialized route-and-compliance engine that simulates
 - **Nominatim (OpenStreetMap)**: Used for high-precision geocoding, converting address strings into coordinate pairs (Longitude, Latitude).
 - **OSRM (Open Source Routing Machine)**: Fetches optimal driving routes and exact distance geometry between waypoints.
 
-#### ⚙️ Scheduling & Simulation Flow
-The core logic in `backend/api/utils.py` follows a recursive simulation pattern:
-1. **Route Pre-processing**: Fetches the entire path geometry as a series of coordinates.
-2. **FMCSA Simulation**: A step-by-step drive simulation that monitors four distinct "clocks" (11-hour driving, 14-hour duty, 30-min break, and 70-hour cycle) in accordance with **U.S. FMCSA (Federal Motor Carrier Safety Administration)** traffic laws.
-3. **Smart Stop Insertion**: Automatically determines where the driver *must* stop for fuel, rest, or sleep based on the calculated clocks.
-4. **Local Interpolation**: Instead of making expensive API calls for every stop, the system uses **linear interpolation** to calculate the exact coordinates of each regulatory stop along the predefined route geometry.
+#### Architecture
+The backend follows a modular Django app structure:
+- **apps/geocoding/**: Handles address-to-coordinate conversion using Nominatim API
+- **apps/routing/**: Manages route calculation via OSRM service
+- **apps/compliance/**: Contains FMCSA simulation engine and driving logic
+- **apps/trips/**: Orchestrates the complete trip planning workflow
+- **services/**: Main service layer that orchestrates all apps
+
+#### API Endpoints
+- `/trips/generate/` - Main endpoint for trip planning with compliance
+- Uses REST framework with proper CORS configuration for production
 
 #### 📊 Output Generation
 The simulation results in a structured timeline of logs and an interactive map overlay, providing a complete 8-day view of the intended trip.
