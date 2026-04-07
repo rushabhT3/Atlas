@@ -378,9 +378,83 @@ function App() {
           <AddressInput label="Dropoff Location" value={formData.dropoff} onChange={v => setFormData({...formData, dropoff: v})} />
           
           <div style={{ marginBottom: '15px' }}>
-            <label style={{fontWeight: 'bold', fontSize: '12px', display: 'block', marginBottom: '5px'}}>
-              Current Cycle Used (Hrs)
-            </label>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
+              <label style={{ fontWeight: 'bold', fontSize: '12px', marginRight: '5px' }}>
+                Current Cycle Used (Hrs)
+              </label>
+              <div style={{ 
+                position: 'relative', 
+                display: 'inline-block', 
+                cursor: 'help',
+                color: '#6b7280',
+                fontSize: '14px',
+                marginLeft: '5px'
+              }}
+              onMouseEnter={(e) => {
+                const tooltip = e.currentTarget.querySelector('.tooltip');
+                const arrow = e.currentTarget.querySelector('.arrow');
+                if (tooltip) {
+                  tooltip.style.opacity = '1';
+                  tooltip.style.visibility = 'visible';
+                }
+                if (arrow) {
+                  arrow.style.opacity = '1';
+                  arrow.style.visibility = 'visible';
+                }
+              }}
+              onMouseLeave={(e) => {
+                const tooltip = e.currentTarget.querySelector('.tooltip');
+                const arrow = e.currentTarget.querySelector('.arrow');
+                if (tooltip) {
+                  tooltip.style.opacity = '0';
+                  tooltip.style.visibility = 'hidden';
+                }
+                if (arrow) {
+                  arrow.style.opacity = '0';
+                  arrow.style.visibility = 'hidden';
+                }
+              }}>
+                <span style={{ fontSize: '12px' }}>?</span>
+                <div className="tooltip" style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  backgroundColor: '#1f2937',
+                  color: 'white',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  whiteSpace: 'normal',
+                  lineHeight: '1.4',
+                  opacity: 0,
+                  visibility: 'hidden',
+                  transition: 'opacity 0.3s, visibility 0.3s',
+                  zIndex: 1000,
+                  marginBottom: '5px',
+                  width: '250px',
+                  textAlign: 'center',
+                  wordWrap: 'break-word'
+                }}>
+                  Hours used in current 70-hour duty cycle. FMCSA limits drivers to 70 hours in 8 days.
+                </div>
+                <div className="arrow" style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 0,
+                  height: 0,
+                  borderLeft: '5px solid transparent',
+                  borderRight: '5px solid transparent',
+                  borderTop: '5px solid #1f2937',
+                  opacity: 0,
+                  visibility: 'hidden',
+                  transition: 'opacity 0.3s, visibility 0.3s',
+                  marginBottom: '0px'
+                }}></div>
+              </div>
+            </div>
             <input 
               type="number" 
               value={formData.cycle} 
