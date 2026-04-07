@@ -31,7 +31,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://atlas-rho-sable.vercel.app",
+    "https://atlas-ghxm.onrender.com",
 ]
+
+# For production, you might also want:
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only in development
 
 CSRF_TRUSTED_ORIGINS = [
     "https://atlas-rho-sable.vercel.app",
