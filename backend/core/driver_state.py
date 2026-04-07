@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from collections.abc import Sequence
 from .config import FMCSARegulations
 
 
@@ -38,8 +38,8 @@ class DriverState:
         self.current_time = 6.0  # Start at 6:00 AM
 
         # Track logs and stops
-        self.logs: List[LogEntry] = []
-        self.stops: List[StopInfo] = []
+        self.logs: Sequence[LogEntry] = []
+        self.stops: Sequence[StopInfo] = []
 
     def add_event(
         self,

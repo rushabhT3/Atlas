@@ -1,4 +1,5 @@
-from typing import List, Optional, Tuple
+from collections.abc import Sequence
+from typing import Optional, Tuple
 from core.config import FMCSARegulations
 from core.driver_state import DriverState
 
@@ -8,7 +9,7 @@ class RouteInterpolator:
 
     @staticmethod
     def interpolate_along_route(
-        geometry_coords: List[Tuple[float, float]], fraction: float
+        geometry_coords: Sequence[Tuple[float, float]], fraction: float
     ) -> Optional[str]:
         """
         Get a point along the route at a given fraction (0.0 to 1.0)
@@ -71,7 +72,7 @@ class DrivingSimulator:
         self,
         start_coords: str,
         total_miles: float,
-        geometry_coords: List[Tuple[float, float]],
+        geometry_coords: Sequence[Tuple[float, float]],
         leg_name: str,
     ):
         """Simulate driving a route leg with all required stops"""
@@ -129,7 +130,7 @@ class DrivingSimulator:
 
     def _get_position(
         self,
-        geometry_coords: List[Tuple[float, float]],
+        geometry_coords: Sequence[Tuple[float, float]],
         fraction: float,
         fallback_coords: str,
     ) -> str:
