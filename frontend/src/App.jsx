@@ -8,6 +8,10 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import ErrorBoundary from './components/ErrorBoundary';
 
+// Import shared utilities (keeping working hooks local)
+import { parseCoords, formatTime } from './utils';
+import { ROUTE_COLORS, STOP_STYLES } from './constants';
+
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 let DefaultIcon = L.icon({ iconUrl: icon, shadowUrl: iconShadow, iconAnchor: [12, 41] });
@@ -86,29 +90,6 @@ const useVerticalResize = (containerRef, initialHeight, minHeight, maxHeight) =>
 };
 
 // ============================================
-// ROUTE COLORS
-// ============================================
-const ROUTE_COLORS = {
-  leg1: { main: '#f97316', shadow: '#c2410c', label: 'To Pickup' },
-  leg2: { main: '#22c55e', shadow: '#166534', label: 'To Dropoff' }
-};
-
-// ============================================
-// STOP STYLES
-// ============================================
-const STOP_STYLES = {
-  start: { color: '#3b82f6', fillColor: '#3b82f6', icon: '🚛', label: 'Trip Start', letter: 'S' },
-  end: { color: '#ef4444', fillColor: '#ef4444', icon: '🏁', label: 'Trip End', letter: 'E' },
-  pickup: { color: '#f97316', fillColor: '#f97316', icon: '📦', label: 'Pickup', letter: 'P' },
-  dropoff: { color: '#22c55e', fillColor: '#22c55e', icon: '📬', label: 'Dropoff', letter: 'D' },
-  fuel: { color: '#eab308', fillColor: '#eab308', icon: '⛽', label: 'Fuel Stop', letter: 'F' },
-  sleep: { color: '#6366f1', fillColor: '#6366f1', icon: '🛏️', label: 'Sleeper (10hr)', letter: 'Z' },
-  break: { color: '#14b8a6', fillColor: '#14b8a6', icon: '☕', label: 'Break (30min)', letter: 'B' },
-  restart: { color: '#ec4899', fillColor: '#ec4899', icon: '🔄', label: '34hr Restart', letter: 'R' },
-  inspection: { color: '#64748b', fillColor: '#64748b', icon: '🔍', label: 'Inspection', letter: 'I' }
-};
-
-// ============================================
 // HELPERS
 // ============================================
 const createCustomIcon = (stopType) => {
@@ -127,27 +108,6 @@ const createCustomIcon = (stopType) => {
     iconAnchor: [16, 40],
     popupAnchor: [0, -36]
   });
-};
-
-const parseCoords = (coordString) => {
-  if (!coordString || typeof coordString !== 'string') return null;
-  try {
-    const parts = coordString.split(',');
-    if (parts.length !== 2) return null;
-    const lon = parseFloat(parts[0].trim());
-    const lat = parseFloat(parts[1].trim());
-    if (isNaN(lat) || isNaN(lon)) return null;
-    return [lat, lon];
-  } catch (e) {
-    return null;
-  }
-};
-
-const formatTime = (hours) => {
-  const day = Math.floor(hours / 24) + 1;
-  const h = Math.floor(hours % 24);
-  const m = Math.floor((hours % 1) * 60);
-  return `Day ${day}, ${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
 };
 
 // ============================================
@@ -254,8 +214,8 @@ const StopMarkers = ({ stops }) => {
                 </div>
                 <div style={{ fontSize: '12px', color: '#333', marginBottom: '5px' }}>{stop.remark}</div>
                 <div style={{ fontSize: '11px', color: '#666' }}>
-                  <div>⏰ {formatTime(stop.time)}</div>
-                  {stop.duration > 0 && <div>⏱️ {(stop.duration * 60).toFixed(0)} min</div>}
+                  <div> {formatTime(stop.time)}</div>
+                  {stop.duration > 0 && <div> {(stop.duration * 60).toFixed(0)} min</div>}
                 </div>
               </div>
             </Popup>
@@ -329,7 +289,10 @@ function App() {
       }
     } catch (err) { 
       setError("Error connecting to server or processing trip.");
-      console.error(err);
+      // Log error for debugging but don't expose to user
+      if (import.meta.env.DEV) {
+        console.error('API Error:', err);
+      }
     } finally {
       setLoading(false);
     }
