@@ -27,9 +27,11 @@ class TripApiService {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const message = error.response?.data?.error || error.message || 'Failed to generate trip';
+        console.error('Trip generation error:', error.response?.data || error.message);
         return { error: message };
       }
       
+      console.error('Unexpected error:', error);
       return { error: 'An unexpected error occurred' };
     }
   }
