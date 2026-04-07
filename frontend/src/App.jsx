@@ -312,7 +312,7 @@ function App() {
     setLeg2Coords([]);
     
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL;
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
       const res = await axios.post(`${backendUrl}/api/generate-trip/`, formData);
       
       if (res.data.error) {

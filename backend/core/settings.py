@@ -48,7 +48,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "rest_framework",
+    # Legacy API app (for backward compatibility)
     "api",
+    # New modular apps
+    "apps.geocoding",
+    "apps.routing",
+    "apps.compliance",
+    "apps.trips",
 ]
 
 MIDDLEWARE = [

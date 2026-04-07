@@ -43,3 +43,28 @@ The core logic in `backend/api/utils.py` follows a recursive simulation pattern:
 
 #### 📊 Output Generation
 The simulation results in a structured timeline of logs and an interactive map overlay, providing a complete 8-day view of the intended trip.
+
+## Installation
+
+### 1. Backend Setup & Run (Django)
+From the project root:
+```bash
+cd backend
+python -m venv .venv
+
+# Activate virtual environment
+# Windows: .venv\Scripts\activate | macOS/Linux: source .venv/bin/activate
+
+pip install -r requirements.txt
+python manage.py runserver
+```
+
+### 2. Frontend Setup & Run (React/Vite)
+From the project root:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The backend server will run on `http://localhost:8000` and the frontend will be available at `http://localhost:5173` (or another port as specified by Vite).
