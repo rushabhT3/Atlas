@@ -386,6 +386,18 @@ function App() {
 
   // Load saved calibration from localStorage on mount
   useEffect(() => {
+    const warmUp = () => {
+      try {
+        const backendUrl =
+          import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+        axios
+          .get(`${backendUrl}/trips/auto-early-flight/`, { timeout: 3000 })
+          .catch(() => {});
+      } catch {}
+    };
+
+    warmUp();
+
     const saved = localStorage.getItem("eldCalibration");
     if (saved) {
       try {
