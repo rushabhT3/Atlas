@@ -1,10 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
-const AddressInput = ({ label, value, onChange }) => {
+const AddressInput = ({ label, value, onChange, clearSignal }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const debounceTimer = useRef(null);
+
+  useEffect(() => {
+    if (clearSignal) {
+      setSuggestions([]);
+    }
+  }, [clearSignal]);
 
   // Cleanup timer on unmount
   useEffect(() => {

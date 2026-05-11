@@ -364,6 +364,7 @@ function App() {
     dropoff: "",
     cycle: 0,
   });
+  const [submitCount, setSubmitCount] = useState(0);
   const [tripData, setTripData] = useState(null);
   const [leg1Coords, setLeg1Coords] = useState([]);
   const [leg2Coords, setLeg2Coords] = useState([]);
@@ -416,6 +417,7 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setSubmitCount((c) => c + 1);
     setError(null);
     setTripData(null);
     setLeg1Coords([]);
@@ -509,16 +511,19 @@ function App() {
               label="Current Location"
               value={formData.current}
               onChange={(v) => setFormData({ ...formData, current: v })}
+              clearSignal={submitCount}
             />
             <AddressInput
               label="Pickup Location"
               value={formData.pickup}
               onChange={(v) => setFormData({ ...formData, pickup: v })}
+              clearSignal={submitCount}
             />
             <AddressInput
               label="Dropoff Location"
               value={formData.dropoff}
               onChange={(v) => setFormData({ ...formData, dropoff: v })}
+              clearSignal={submitCount}
             />
 
             <div style={{ marginBottom: "15px" }}>
