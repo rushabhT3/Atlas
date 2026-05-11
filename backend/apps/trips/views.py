@@ -13,6 +13,6 @@ def generate_trip(request):
 
 
 @api_view(["GET"])
-def early_starter():
+def early_starter(request):
     """API pre-loads on app load to avoid cold-start latency."""
     return Response({"message": "early starter endpoint"}, status=status.HTTP_200_OK)
