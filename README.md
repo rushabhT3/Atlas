@@ -34,19 +34,20 @@ Atlas/
 The backend is built as a specialized route-and-compliance engine that simulates driving events based on real-world geography and legal requirements.
 
 #### 🌍 External Service Integration
-- **Nominatim (OpenStreetMap)**: Used for high-precision geocoding, converting address strings into coordinate pairs (Longitude, Latitude).
-- **OSRM (Open Source Routing Machine)**: Fetches optimal driving routes and exact distance geometry between waypoints.
+- **LocationIQ**: Primary provider for both geocoding (address strings → Longitude/Latitude pairs) and routing (driving routes + distance geometry). Requires a free API key and works from cloud hosts. Its responses are OSM-compatible.
+- **Nominatim / OSRM (fallback)**: The public OpenStreetMap demo servers, used automatically when no LocationIQ key is configured. Fine for local development, but they block cloud/datacenter IPs, so a key is required in production.
 
 #### Architecture
 The backend follows a modular Django app structure:
-- **apps/geocoding/**: Handles address-to-coordinate conversion using Nominatim API
-- **apps/routing/**: Manages route calculation via OSRM service
+- **apps/geocoding/**: Handles address-to-coordinate conversion (LocationIQ, with Nominatim fallback)
+- **apps/routing/**: Manages route calculation (LocationIQ, with OSRM fallback)
 - **apps/compliance/**: Contains FMCSA simulation engine and driving logic
 - **apps/trips/**: Orchestrates the complete trip planning workflow
 - **services/**: Main service layer that orchestrates all apps
 
 #### API Endpoints
-- `/trips/generate/` - Main endpoint for trip planning with compliance
+- `POST /trips/generate/` - Main endpoint for trip planning with compliance
+- `GET /api/health/` - Lightweight health/warm-up check; the frontend hits this on page load to avoid cold-start latency
 - Uses REST framework with proper CORS configuration for production
 
 #### 📊 Output Generation
@@ -67,7 +68,26 @@ pip install -r requirements.txt
 python manage.py runserver
 ```
 
-### 2. Frontend Setup & Run (React/Vite)
+### 2. Configure the Geocoding & Routing API Key (LocationIQ)
+
+Atlas uses **LocationIQ** for geocoding and routing. Without a key it falls back to the public Nominatim/OSRM demo servers, which work locally but are blocked on cloud hosts (e.g. Render) — so a key is **required in production**.
+
+1. Create a free account at [locationiq.com](https://locationiq.com) and copy your **Access Token**.
+2. Expose it as the `LOCATIONIQ_API_KEY` environment variable:
+
+```bash
+# Local development
+# macOS/Linux:
+export LOCATIONIQ_API_KEY="your_access_token"
+# Windows (PowerShell):
+$env:LOCATIONIQ_API_KEY="your_access_token"
+```
+
+**Production (Render):** open your service → **Environment** tab → add a variable named `LOCATIONIQ_API_KEY` with your token as the value → save (Render redeploys automatically).
+
+> Free tier: 5,000 requests/day. Each trip uses ~5 requests (3 geocode + 2 routing).
+
+### 3. Frontend Setup & Run (React/Vite)
 From the project root:
 ```bash
 cd frontend

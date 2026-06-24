@@ -52,18 +52,20 @@ backend/
 - **Purpose**: Convert addresses to geographic coordinates
 - **Services**: 
   - `GeocodingService` (Abstract base)
-  - `NominatimGeocodingService` (OpenStreetMap)
+  - `LocationIQGeocodingService` (LocationIQ — primary, requires API key)
+  - `NominatimGeocodingService` (OpenStreetMap — fallback for local dev)
   - `MockGeocodingService` (Testing)
-- **Dependency**: External Nominatim API
+- **Dependency**: LocationIQ API (falls back to public Nominatim when no `LOCATIONIQ_API_KEY` is set)
 
 ### **2. `apps.routing`**
 - **Purpose**: Calculate driving routes and distances
 - **Services**:
   - `RoutingService` (Abstract base)
-  - `OSRMRoutingService` (Open Source Routing Machine)
+  - `LocationIQRoutingService` (LocationIQ — primary, requires API key)
+  - `OSRMRoutingService` (Open Source Routing Machine — fallback for local dev)
   - `MockRoutingService` (Testing)
 - **Models**: `RouteInfo` dataclass
-- **Dependency**: External OSRM API
+- **Dependency**: LocationIQ API (falls back to public OSRM when no `LOCATIONIQ_API_KEY` is set)
 
 ### **3. `apps.compliance`**
 - **Purpose**: FMCSA regulation compliance simulation
@@ -102,12 +104,12 @@ backend/
 
 ## **API Endpoints**
 
-### **Main API**
+### **Trip Planning**
 ```
 POST /trips/generate/
 ```
 
-Both endpoints accept the same payload:
+Accepts the following payload:
 ```json
 {
     "current": "Starting location",
@@ -116,6 +118,13 @@ Both endpoints accept the same payload:
     "cycle": 0.0
 }
 ```
+
+### **Health Check**
+```
+GET /api/health/
+```
+
+Returns `{"status": "ok"}`. The frontend calls this on page load to warm up the server and reduce cold-start latency.
 
 ## **Development Workflow**
 
@@ -133,7 +142,7 @@ Both endpoints accept the same payload:
 - **API Tests**: Test endpoints end-to-end
 
 ### **Deployment Considerations**
-- **Environment Variables**: API URLs, timeouts, user agents
+- **Environment Variables**: `LOCATIONIQ_API_KEY` (geocoding/routing), plus service timeouts and user agents
 - **Service Configuration**: Easy swapping of real/mock services
 - **Monitoring**: Each service can be monitored independently
 - **Scaling**: Apps can be scaled independently if needed

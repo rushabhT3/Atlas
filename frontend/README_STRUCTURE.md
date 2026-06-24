@@ -2,7 +2,7 @@
 
 ## Overview
 
-This frontend follows React best practices with a feature-based architecture, modern hooks, TypeScript support, and enterprise-grade patterns.
+This frontend follows React best practices with a component-based architecture, modern hooks, TypeScript support for shared logic, and enterprise-grade patterns.
 
 ## Architecture
 
@@ -10,67 +10,51 @@ This frontend follows React best practices with a feature-based architecture, mo
 
 ```
 frontend/src/
-|-- features/                    # Feature-based modules
-|   |-- trip-planning/          # Trip planning feature
-|   |   |-- components/         # Feature-specific components
-|   |   |   |-- TripForm.tsx
-|   |   |   |-- TripSummaryPanel.tsx
-|   |   |   |-- StopsList.tsx
-|   |   |-- hooks/               # Feature-specific hooks
-|   |   |   |-- useTripPlanning.ts
-|   |   |-- index.tsx            # Feature entry point
-|   |   |-- exports.ts           # Feature exports
-|   |-- calibration/            # Calibration feature
-|   |-- map/                    # Map feature
-|   |-- index.ts                # Features barrel export
+|-- components/                  # UI components
+|   |-- AddressInput.jsx         # Location entry with autocomplete + validation
+|   |-- CalibrationTool.jsx      # System parameter adjustment
+|   |-- LogCanvas.jsx            # Interactive ELD log visualizer
+|   |-- ErrorBoundary.jsx        # Catches and renders component errors
 |
-|-- shared/                      # Shared components
-|   |-- components/              # Reusable UI components
-|   |-- hooks/                   # Shared custom hooks
-|   |-- utils/                   # Utility functions
-|
-|-- hooks/                       # Global custom hooks
-|   |-- useHorizontalResize.ts
-|   |-- useVerticalResize.ts
-|   |-- useLocalStorage.ts
-|   |-- useDebounce.ts
+|-- hooks/                       # Custom React hooks
+|   |-- index.ts                 # useHorizontalResize, useVerticalResize,
+|                                #   useLocalStorage, useDebounce
 |
 |-- services/                    # API services
-|   |-- api.ts                   # API client
+|   |-- api.ts                   # Axios-based API client (generateTrip, healthCheck)
 |
 |-- utils/                       # Utility functions
-|   |-- index.ts                 # Coordinate parsing, formatting, etc.
+|   |-- index.ts                 # Coordinate parsing, time formatting, etc.
 |
 |-- constants/                   # Application constants
-|   |-- index.js                 # Route colors, stop styles, etc.
+|   |-- index.js                 # Route colors, stop styles, UI constants, endpoints
 |
 |-- types/                       # TypeScript type definitions
-|   |-- index.ts                 # All type definitions
+|   |-- index.ts                 # Shared interfaces (TripData, LogEntry, etc.)
 |
-|-- assets/                      # Static assets
-|   |-- react.svg
+|-- assets/                      # Static assets (images, svg)
 |
-|-- App.jsx                      # Legacy app (will be refactored)
+|-- App.jsx                      # Main application shell, map + form integration
 |-- main.jsx                     # Application entry point
 ```
 
 ## **Design Principles**
 
-### **1. Feature-Based Architecture**
+### **1. Component-Based Architecture**
 
-- Each feature is self-contained
-- Co-located components, hooks, and types
-- Clear feature boundaries
+- Reusable, self-contained components
+- Co-located UI concerns
+- Clear component boundaries
 
 ### **2. Modern React Patterns**
 
 - Functional components with hooks
 - Custom hooks for business logic
-- No class components (unless absolutely necessary)
+- No class components (unless absolutely necessary, e.g. error boundaries)
 
 ### **3. TypeScript Support**
 
-- Full type safety
+- Type-safe shared logic (hooks, services, utils, types)
 - Interface definitions for all data structures
 - Type-safe API responses
 
@@ -84,16 +68,22 @@ frontend/src/
 
 ## **Key Features**
 
-### **Trip Planning Feature**
+### **API Service**
 
 ```typescript
 // Usage
-import { TripPlanningFeature } from '@/features/trip-planning';
+import { tripApi } from "./services/api";
 
-<TripPlanningFeature
-  initialFormData={{ current: '', pickup: '', dropoff: '', cycle: 0 }}
-  onFormDataChange={(data) => console.log(data)}
-/>
+// Warm-up / health check on load
+await tripApi.healthCheck();
+
+// Generate a trip plan
+const { data, error } = await tripApi.generateTrip({
+  current: "",
+  pickup: "",
+  dropoff: "",
+  cycle: 0,
+});
 ```
 
 ### **Custom Hooks**
@@ -154,8 +144,8 @@ interface TripData {
 ### **5. Code Organization**
 
 - **Barrel Exports**: Clean imports
-- **Index Files**: Feature organization
-- **Absolute Imports**: Consistent paths
+- **Index Files**: Module organization
+- **Consistent Paths**: Predictable imports
 - **Naming Conventions**: Clear, descriptive names
 
 ## **Modern JavaScript/TypeScript**
@@ -178,22 +168,19 @@ interface TripData {
 
 ## **Development Workflow**
 
-### **Adding New Features**
+### **Adding New Components**
 
-1. Create feature directory: `src/features/feature-name/`
-2. Add components: `components/ComponentName.tsx`
-3. Add hooks: `hooks/useFeatureName.ts`
-4. Add types: `types/index.ts` (if needed)
-5. Update exports: `exports.ts`
-6. Update barrel: `features/index.ts`
+1. Create the component: `src/components/ComponentName.jsx`
+2. Add shared logic to `hooks/` or `utils/` if reusable
+3. Add types: `types/index.ts` (if needed)
+4. Wire it into `App.jsx` (or its parent component)
 
 ### **Component Guidelines**
 
 1. Single responsibility principle
-2. Props interface required
+2. Clear prop interface
 3. Default exports preferred
-4. Storybook stories (if applicable)
-5. Unit tests (if applicable)
+4. Unit tests (if applicable)
 
 ### **Hook Guidelines**
 
@@ -209,38 +196,33 @@ interface TripData {
 
 - Fast HMR (Hot Module Replacement)
 - TypeScript support
-- Path aliases configured
-- Environment variables
+- Environment variables (`VITE_BACKEND_URL`)
 
 ### **Linting & Formatting**
 
 - ESLint configured
 - Prettier integrated
-- Pre-commit hooks
-- CI/CD integration
 
 ### **Build Optimization**
 
 - Code splitting
 - Tree shaking
 - Asset optimization
-- Bundle analysis
 
 ## **Benefits of This Structure**
 
 ### **Maintainability**
 
-- Clear feature boundaries
+- Clear separation of concerns
 - Easy to locate code
 - Consistent patterns
-- Type safety
+- Type safety for shared logic
 
 ### **Scalability**
 
-- Feature-based scaling
 - Reusable components
-- Shared utilities
-- Modular architecture
+- Shared utilities and hooks
+- Modular organization
 
 ### **Developer Experience**
 
@@ -251,27 +233,6 @@ interface TripData {
 
 ### **Team Collaboration**
 
-- Feature ownership
 - Clear interfaces
 - Reduced conflicts
 - Easy onboarding
-
-## **Migration Path**
-
-### **From Legacy Structure**
-
-1. Identify features in `App.jsx`
-2. Extract to feature modules
-3. Create shared components
-4. Add TypeScript types
-5. Update imports
-6. Remove legacy code
-
-### **Gradual Migration**
-
-- Features can be migrated independently
-- Legacy code remains functional
-- A/B testing possible
-- Zero-downtime deployment
-
-## **This structure represents world-class React development practices and is ready for enterprise-scale applications!**
