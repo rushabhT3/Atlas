@@ -1,3 +1,15 @@
-from .services import RoutingService, OSRMRoutingService, MockRoutingService, RouteInfo
+from .services import (
+    RoutingService,
+    OSRMRoutingService,
+    LocationIQRoutingService,
+    MockRoutingService,
+    RouteInfo,
+)
 
-__all__ = ["RoutingService", "OSRMRoutingService", "MockRoutingService", "RouteInfo"]
+__all__ = [
+    "RoutingService",
+    "OSRMRoutingService",
+    "LocationIQRoutingService",
+    "MockRoutingService",
+    "RouteInfo",
+]

@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,6 +41,13 @@ CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only in development
 CSRF_TRUSTED_ORIGINS = [
     "https://atlas-rho-sable.vercel.app",
 ]
+
+# External services
+# LocationIQ API key for geocoding + routing (https://locationiq.com).
+# Set this in the environment (e.g. Render env vars). When empty, the app
+# falls back to the public Nominatim/OSRM demo servers (fine for local dev,
+# but those block cloud/datacenter IPs in production).
+LOCATIONIQ_API_KEY = os.environ.get("LOCATIONIQ_API_KEY", "")
 
 # Application definition
 

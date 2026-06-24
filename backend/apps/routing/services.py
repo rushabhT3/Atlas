@@ -1,8 +1,11 @@
+import time
 import requests
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from typing import Any, Optional, Tuple
 from dataclasses import dataclass
+
+from django.conf import settings
 
 
 @dataclass
@@ -67,6 +70,75 @@ class OSRMRoutingService(RoutingService):
         except (KeyError, ValueError) as e:
             print(f"OSRM Data Error: {e}")
             return None
+
+
+class LocationIQRoutingService(RoutingService):
+    """LocationIQ routing implementation.
+
+    LocationIQ's directions API is OSRM-compatible, so the response format
+    matches OSRMRoutingService (routes[0] with 'distance' and 'geometry').
+    Unlike the public OSRM demo server, it allows server-side/cloud use with
+    an API key.
+    """
+
+    def __init__(self, api_key: str = "", timeout: int = 30):
+        self.api_key = api_key or getattr(settings, "LOCATIONIQ_API_KEY", "")
+        self.timeout = timeout
+        self.base_url = "https://us1.locationiq.com/v1/directions/driving"
+
+    def get_route(self, start_coords: str, end_coords: str) -> Optional[RouteInfo]:
+        """Get route from the LocationIQ directions API"""
+        if not start_coords or not end_coords:
+            return None
+
+        if not self.api_key:
+            print("Routing Error: LOCATIONIQ_API_KEY is not set")
+            return None
+
+        url = f"{self.base_url}/{start_coords};{end_coords}"
+        params = {
+            "key": self.api_key,
+            "overview": "full",
+            "geometries": "geojson",
+        }
+
+        for attempt in range(2):
+            try:
+                response = requests.get(url, params=params, timeout=self.timeout)
+
+                # Free tier allows 2 req/s; back off once if we burst past it.
+                if response.status_code == 429 and attempt == 0:
+                    time.sleep(1)
+                    continue
+
+                response.raise_for_status()
+                data = response.json()
+
+                if "routes" not in data or len(data["routes"]) == 0:
+                    print(
+                        f"Routing Error: No route found between {start_coords} and {end_coords}"
+                    )
+                    return None
+
+                route = data["routes"][0]
+                distance_miles = route["distance"] * 0.000621371  # meters to miles
+                geometry = route["geometry"]
+                coordinates = geometry.get("coordinates", [])
+
+                return RouteInfo(
+                    distance_miles=distance_miles,
+                    geometry=geometry,
+                    coordinates=coordinates,
+                )
+
+            except requests.RequestException as e:
+                print(f"Routing Request Error: {e}")
+                return None
+            except (KeyError, ValueError) as e:
+                print(f"Routing Data Error: {e}")
+                return None
+
+        return None
 
 
 class MockRoutingService(RoutingService):

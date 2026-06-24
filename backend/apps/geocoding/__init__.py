@@ -1,3 +1,13 @@
-from .services import GeocodingService, NominatimGeocodingService, MockGeocodingService
+from .services import (
+    GeocodingService,
+    NominatimGeocodingService,
+    LocationIQGeocodingService,
+    MockGeocodingService,
+)
 
-__all__ = ["GeocodingService", "NominatimGeocodingService", "MockGeocodingService"]
+__all__ = [
+    "GeocodingService",
+    "NominatimGeocodingService",
+    "LocationIQGeocodingService",
+    "MockGeocodingService",
+]

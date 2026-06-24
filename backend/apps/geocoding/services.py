@@ -1,6 +1,9 @@
+import time
 import requests
 from abc import ABC, abstractmethod
 from typing import Optional
+
+from django.conf import settings
 
 
 class GeocodingService(ABC):
@@ -46,6 +49,67 @@ class NominatimGeocodingService(GeocodingService):
         except (KeyError, IndexError) as e:
             print(f"Geocode Data Error for '{place}': {e}")
             return None
+
+
+class LocationIQGeocodingService(GeocodingService):
+    """LocationIQ geocoding implementation.
+
+    LocationIQ is built on OSM/Nominatim data, so the response format matches
+    Nominatim (array of objects with 'lat'/'lon'). Unlike the public Nominatim
+    server, it allows server-side/cloud use with an API key.
+    """
+
+    def __init__(self, api_key: str = "", timeout: int = 15):
+        self.api_key = api_key or getattr(settings, "LOCATIONIQ_API_KEY", "")
+        self.timeout = timeout
+        self.base_url = "https://us1.locationiq.com/v1/search"
+
+    def geocode(self, place: str) -> Optional[str]:
+        """Convert address to coordinates using the LocationIQ API"""
+        if not place or not place.strip():
+            return None
+
+        if not self.api_key:
+            print("Geocode Error: LOCATIONIQ_API_KEY is not set")
+            return None
+
+        params = {
+            "key": self.api_key,
+            "q": place,
+            "format": "json",
+            "limit": 1,
+            "countrycodes": "us",
+        }
+
+        for attempt in range(2):
+            try:
+                response = requests.get(
+                    self.base_url, params=params, timeout=self.timeout
+                )
+
+                # Free tier allows 2 req/s; back off once if we burst past it.
+                if response.status_code == 429 and attempt == 0:
+                    time.sleep(1)
+                    continue
+
+                response.raise_for_status()
+                data = response.json()
+
+                if not data:
+                    print(f"Geocode Error: No results found for '{place}'")
+                    return None
+
+                result = data[0]
+                return f"{result['lon']},{result['lat']}"
+
+            except requests.RequestException as e:
+                print(f"Geocode Error for '{place}': {e}")
+                return None
+            except (KeyError, IndexError) as e:
+                print(f"Geocode Data Error for '{place}': {e}")
+                return None
+
+        return None
 
 
 class MockGeocodingService(GeocodingService):

@@ -1,8 +1,18 @@
 from typing import Any
+from django.conf import settings
 from core.config import FMCSARegulations
 from core.driver_state import DriverState, StopInfo
-from apps.geocoding import GeocodingService, NominatimGeocodingService
-from apps.routing import RoutingService, OSRMRoutingService, RouteInfo
+from apps.geocoding import (
+    GeocodingService,
+    NominatimGeocodingService,
+    LocationIQGeocodingService,
+)
+from apps.routing import (
+    RoutingService,
+    OSRMRoutingService,
+    LocationIQRoutingService,
+    RouteInfo,
+)
 from apps.compliance import DrivingSimulator
 
 
@@ -17,8 +27,17 @@ class TripPlanner:
     ):
         """Initialize trip planner with dependency injection"""
         self.regulations = regulations or FMCSARegulations()
-        self.geocoding_service = geocoding_service or NominatimGeocodingService()
-        self.routing_service = routing_service or OSRMRoutingService()
+
+        # Use LocationIQ when an API key is configured (works on cloud hosts
+        # like Render); otherwise fall back to the public Nominatim/OSRM demo
+        # servers, which are fine for local dev but block datacenter IPs.
+        api_key = getattr(settings, "LOCATIONIQ_API_KEY", "")
+        self.geocoding_service = geocoding_service or (
+            LocationIQGeocodingService() if api_key else NominatimGeocodingService()
+        )
+        self.routing_service = routing_service or (
+            LocationIQRoutingService() if api_key else OSRMRoutingService()
+        )
 
     def plan_trip(
         self,
