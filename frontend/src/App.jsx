@@ -18,6 +18,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 // Import shared utilities (keeping working hooks local)
 import { parseCoords, formatTime } from "./utils";
 import { ROUTE_COLORS, STOP_STYLES } from "./constants";
+import { tripApi } from "./services/api";
 
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
@@ -387,17 +388,7 @@ function App() {
 
   // Load saved calibration from localStorage on mount
   useEffect(() => {
-    const warmUp = () => {
-      try {
-        const backendUrl =
-          import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
-        axios
-          .get(`${backendUrl}/trips/auto-early-flight/`, { timeout: 3000 })
-          .catch(() => {});
-      } catch {}
-    };
-
-    warmUp();
+    tripApi.healthCheck();
 
     const saved = localStorage.getItem("eldCalibration");
     if (saved) {
