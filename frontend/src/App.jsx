@@ -436,7 +436,11 @@ function App() {
         }
       }
     } catch (err) {
-      setError("Error connecting to server or processing trip.");
+      // Axios throws on non-2xx responses, so backend errors 
+      // (e.g. 400 "Could not calculate route from Pickup to Dropoff.") are caught here instead of the res.data.error branch. 
+      // Show the backend message when available; fall back to the generic one only for network failures without a response.
+      const serverError = err.response?.data?.error;
+      setError(serverError || "Error connecting to server or processing trip.");
       // Log error for debugging but don't expose to user
       if (import.meta.env.DEV) {
         console.error("API Error:", err);
